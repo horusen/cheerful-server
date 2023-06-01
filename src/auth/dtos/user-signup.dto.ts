@@ -3,10 +3,13 @@ import { SameValue } from 'src/shared/validators/same-value.validator';
 
 export class UserSignupDTO {
   @IsNotEmpty()
-  first_name: string;
+  name: string;
 
   @IsNotEmpty()
-  last_name: string;
+  location: string;
+
+  @IsNotEmpty()
+  gender: string;
 
   @IsNotEmpty()
   phone_number: string;
