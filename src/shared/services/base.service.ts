@@ -32,6 +32,7 @@ export class BaseService<Entity> {
   async update(id: number, updateDTO: any) {
     //@ts-expect-error
     const element = await this.repo.findOneBy({ id });
+    if (!element) throw new NotFoundException();
     this.repo.merge(element, updateDTO);
     return this.repo.save(element);
   }
