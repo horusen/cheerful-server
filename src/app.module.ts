@@ -7,9 +7,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { DataSource } from 'typeorm';
 import configuration from 'config/configuration';
 import { AuthModule } from './auth/auth.module';
-import { CategoryStoreModule } from './store/category_store/category_store.module';
 import { StoreModule } from './store/store.module';
-import { TypeStoreModule } from './type-store/type-store.module';
 
 @Module({
   imports: [
@@ -37,7 +35,6 @@ import { TypeStoreModule } from './type-store/type-store.module';
     }),
     AuthModule,
     StoreModule,
-    TypeStoreModule,
   ],
   controllers: [AppController],
   providers: [AppService],

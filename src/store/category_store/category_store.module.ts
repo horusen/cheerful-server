@@ -8,5 +8,6 @@ import { CategoryStore } from './entities/category_store.entity';
   imports: [TypeOrmModule.forFeature([CategoryStore])],
   controllers: [CategoryStoreController],
   providers: [CategoryStoreService],
+  exports: [CategoryStoreService],
 })
 export class CategoryStoreModule {}
