@@ -16,25 +16,27 @@ export class BaseService<Entity> {
     return this.repo.find();
   }
 
-  async findOne(id: string | Partial<Entity>) {
+  async findOne(id: number | Partial<Entity>) {
     const element =
-      typeof id === 'string'
+      typeof id === 'number'
         ? //@ts-expect-error
           await this.repo.findOneBy({ id })
         : //@ts-expect-error
           await this.repo.findOneBy(id);
 
+    if (!element) throw new NotFoundException();
+
     return element;
   }
 
-  async update(id: string, updateDTO: any) {
+  async update(id: number, updateDTO: any) {
     //@ts-expect-error
     const element = await this.repo.findOneBy({ id });
     this.repo.merge(element, updateDTO);
     return this.repo.save(element);
   }
 
-  async remove(id: string) {
+  async remove(id: number) {
     //@ts-expect-error
     const element = await this.repo.findOneBy({ id });
     return this.repo.softRemove(element);
