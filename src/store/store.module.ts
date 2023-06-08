@@ -8,6 +8,7 @@ import { Store } from './entities/store.entity';
 import { CategoryStoreModule } from './category_store/category_store.module';
 import { TypeStoreModule } from 'src/type-store/type-store.module';
 import { StoreSocialMediaModule } from './store_social_media/store_social_media.module';
+import { StorePaymentMethodModule } from './store-payment-method/store-payment-method.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { StoreSocialMediaModule } from './store_social_media/store_social_media.
     TypeStoreModule,
     TypeOrmModule.forFeature([Store]),
     StoreSocialMediaModule,
+    StorePaymentMethodModule,
   ],
   controllers: [StoreController],
   providers: [StoreService],

@@ -9,6 +9,8 @@ import configuration from 'config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { StoreModule } from './store/store.module';
 import { SocialMediaModule } from './social-media/social-media.module';
+import { TypePaymentMethodProviderModule } from './type-payment-method-provider/type-payment-method-provider.module';
+import { PaymentMethodProviderModule } from './payment-method-provider/payment-method-provider.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { SocialMediaModule } from './social-media/social-media.module';
     AuthModule,
     StoreModule,
     SocialMediaModule,
+    TypePaymentMethodProviderModule,
+    PaymentMethodProviderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
