@@ -7,12 +7,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Store } from './entities/store.entity';
 import { CategoryStoreModule } from './category_store/category_store.module';
 import { TypeStoreModule } from 'src/type-store/type-store.module';
+import { StoreSocialMediaModule } from './store_social_media/store_social_media.module';
 
 @Module({
   imports: [
     CategoryStoreModule,
     TypeStoreModule,
     TypeOrmModule.forFeature([Store]),
+    StoreSocialMediaModule,
   ],
   controllers: [StoreController],
   providers: [StoreService],

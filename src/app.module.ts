@@ -8,6 +8,7 @@ import { DataSource } from 'typeorm';
 import configuration from 'config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { StoreModule } from './store/store.module';
+import { SocialMediaModule } from './social-media/social-media.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { StoreModule } from './store/store.module';
     }),
     AuthModule,
     StoreModule,
+    SocialMediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
