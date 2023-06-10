@@ -4,6 +4,9 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class User extends BaseEntity {
   @Column()
+  type_user_id: number;
+
+  @Column()
   name: string;
 
   @Column({
@@ -17,10 +20,10 @@ export class User extends BaseEntity {
   email: string;
 
   @Column()
-  gender: string;
+  gender_id: number;
 
   @Column()
-  location: string;
+  country_id: number;
 
   @Column({
     nullable: true,

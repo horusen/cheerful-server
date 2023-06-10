@@ -29,9 +29,6 @@ export class Store extends BaseEntity {
   @Column({ nullable: true })
   store_logo_image: string;
 
-  @Column({ nullable: false })
-  min_card_price: number;
-
   @ManyToOne((type) => CategoryStore, (categoryStore) => categoryStore.id)
   category: CategoryStore;
 

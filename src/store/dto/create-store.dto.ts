@@ -27,8 +27,4 @@ export class CreateStoreDto {
 
   @Allow()
   store_logo_image: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  min_card_price: number;
 }

@@ -11,6 +11,8 @@ import { StoreModule } from './store/store.module';
 import { SocialMediaModule } from './social-media/social-media.module';
 import { TypePaymentMethodProviderModule } from './type-payment-method-provider/type-payment-method-provider.module';
 import { PaymentMethodProviderModule } from './payment-method-provider/payment-method-provider.module';
+import { StateModule } from './state/state.module';
+import { CityModule } from './city/city.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { PaymentMethodProviderModule } from './payment-method-provider/payment-m
     SocialMediaModule,
     TypePaymentMethodProviderModule,
     PaymentMethodProviderModule,
+    StateModule,
+    CityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
