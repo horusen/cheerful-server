@@ -10,8 +10,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class StoreSocialMediaService extends BaseService<StoreSocialMedia> {
   constructor(
     @InjectRepository(StoreSocialMedia)
-    private readonly categoryStoreRepository: Repository<StoreSocialMedia>,
+    private readonly _repo: Repository<StoreSocialMedia>,
   ) {
-    super(categoryStoreRepository);
+    super(_repo);
+  }
+
+  findByStoreId(storeId: number): Promise<StoreSocialMedia[]> {
+    return this._repo.find({
+      where: { store_id: storeId },
+      relations: ['social_media'],
+    });
   }
 }

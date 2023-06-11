@@ -1,5 +1,8 @@
+import { City } from 'src/city/entities/city.entity';
 import { BaseEntity } from 'src/shared/entities/base.entity';
-import { Column, Entity } from 'typeorm';
+import { State } from 'src/state/entities/state.entity';
+import { Country } from 'src/users/country/entities/country.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class StoreAddress extends BaseEntity {
@@ -20,4 +23,13 @@ export class StoreAddress extends BaseEntity {
 
   @Column({ nullable: true })
   google_maps_link: string;
+
+  @ManyToOne((type) => City, (city) => city.id)
+  city: City;
+
+  @ManyToOne((type) => State, (state) => state.id)
+  state: State;
+
+  @ManyToOne((type) => Country, (country) => country.id)
+  country: Country;
 }

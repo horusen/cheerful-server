@@ -1,8 +1,10 @@
+import { SocialMedia } from 'src/social-media/entities/social-media.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -21,6 +23,9 @@ export class StoreSocialMedia {
 
   @Column({ nullable: false })
   link: string;
+
+  @ManyToOne((type) => SocialMedia, (sm) => sm.id)
+  social_media: SocialMedia;
 
   @CreateDateColumn()
   created_at: Date;

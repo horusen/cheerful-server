@@ -26,6 +26,13 @@ export class PaymentMethodProviderController {
     );
   }
 
+  @Get('type-payment-method-provider/:id')
+  findByTypePaymentMethodProvider(@Param('id') id: number) {
+    return this.PaymentMethodProviderService.findByTypePaymentMethodProviderId(
+      id,
+    );
+  }
+
   @Get()
   findAll() {
     return this.PaymentMethodProviderService.findAll();

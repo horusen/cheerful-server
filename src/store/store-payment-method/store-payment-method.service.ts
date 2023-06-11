@@ -10,8 +10,19 @@ import { Repository } from 'typeorm';
 export class StorePaymentMethodService extends BaseService<StorePaymentMethod> {
   constructor(
     @InjectRepository(StorePaymentMethod)
-    private readonly categoryStoreRepository: Repository<StorePaymentMethod>,
+    private readonly _repo: Repository<StorePaymentMethod>,
   ) {
-    super(categoryStoreRepository);
+    super(_repo);
+  }
+
+  findByStoreId(storeId: number): Promise<StorePaymentMethod[]> {
+    return this._repo.find({
+      where: { store_id: storeId },
+      relations: {
+        payment_method_provider: {
+          type_payment_method_provider: true,
+        },
+      },
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/shared/entities/base.entity';
-import { Column, Entity } from 'typeorm';
+import { TypePaymentMethodProvider } from 'src/type-payment-method-provider/entities/type-payment-method-provider.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class PaymentMethodProvider extends BaseEntity {
@@ -11,4 +12,7 @@ export class PaymentMethodProvider extends BaseEntity {
 
   @Column({ nullable: true })
   description: string;
+
+  @ManyToOne((type) => TypePaymentMethodProvider, (pmp) => pmp.id)
+  type_payment_method_provider: TypePaymentMethodProvider;
 }

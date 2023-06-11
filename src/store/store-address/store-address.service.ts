@@ -12,4 +12,11 @@ export class StoreAddressService extends BaseService<StoreAddress> {
   ) {
     super(_repo);
   }
+
+  findByStoreId(storeId: number): Promise<StoreAddress[]> {
+    return this._repo.find({
+      where: { store_id: storeId },
+      relations: ['city', 'state', 'country'],
+    });
+  }
 }
