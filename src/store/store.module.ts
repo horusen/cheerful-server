@@ -10,11 +10,13 @@ import { TypeStoreModule } from 'src/type-store/type-store.module';
 import { StoreSocialMediaModule } from './store_social_media/store_social_media.module';
 import { StorePaymentMethodModule } from './store-payment-method/store-payment-method.module';
 import { StoreAddressModule } from './store-address/store-address.module';
+import { FileModule } from 'src/file-service/file.module';
 
 @Module({
   imports: [
     CategoryStoreModule,
     TypeStoreModule,
+    FileModule,
     TypeOrmModule.forFeature([Store]),
     StoreSocialMediaModule,
     StorePaymentMethodModule,

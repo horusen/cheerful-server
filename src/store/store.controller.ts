@@ -8,11 +8,15 @@ import {
   Param,
   Delete,
   HttpException,
+  UseInterceptors,
+  UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { CategoryStoreService } from './category_store/category_store.service';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('store')
 export class StoreController {
@@ -23,16 +27,19 @@ export class StoreController {
   ) {}
 
   @Post()
-  create(@Body() createStoreDto: CreateStoreDto) {
+  create(
+    @Body() createStoreDto: CreateStoreDto,
+    @UploadedFile() storeLogo: Express.Multer.File,
+  ) {
     const { category_store_id, type_store_id } = createStoreDto;
 
-    const category = this.categoryStoreService.findOne(category_store_id);
+    const category = this.categoryStoreService.findOne(+category_store_id);
     if (!category) throw new HttpException('Category not found', 422);
 
-    const type = this.typeService.findOne(type_store_id);
+    const type = this.typeService.findOne(+type_store_id);
     if (!type) throw new HttpException('Type not found', 422);
 
-    return this.storeService.create(createStoreDto);
+    return this.storeService.create(createStoreDto, storeLogo);
   }
 
   @Get()
@@ -46,8 +53,13 @@ export class StoreController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
-    return this.storeService.update(+id, updateStoreDto);
+  @UseInterceptors(AnyFilesInterceptor())
+  update(
+    @Param('id') id: string,
+    @Body() updateStoreDto: UpdateStoreDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    return this.storeService.update(+id, updateStoreDto, files[0], files[1]);
   }
 
   @Delete(':id')

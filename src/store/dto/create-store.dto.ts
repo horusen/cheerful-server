@@ -26,6 +26,9 @@ export class CreateStoreDto {
   @Allow()
   store_logo_image: string;
 
+  @Allow()
+  store_cover_image: string;
+
   @IsNotEmpty()
   user_id: number;
 }

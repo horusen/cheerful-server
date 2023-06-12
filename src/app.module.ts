@@ -13,6 +13,8 @@ import { TypePaymentMethodProviderModule } from './type-payment-method-provider/
 import { PaymentMethodProviderModule } from './payment-method-provider/payment-method-provider.module';
 import { StateModule } from './state/state.module';
 import { CityModule } from './city/city.module';
+import { FileServiceService } from './file-service/file-service.service';
+import { FileModule } from './file-service/file.module';
 
 @Module({
   imports: [
