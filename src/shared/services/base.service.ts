@@ -29,18 +29,24 @@ export class BaseService<Entity> {
     return element;
   }
 
+  // TODO: Fix this
   async update(id: number, updateDTO: any) {
     //@ts-expect-error
     const element = await this.repo.findOneBy({ id });
     if (!element) throw new NotFoundException();
-    this.repo.merge(element, updateDTO);
-    return this.repo.save(element);
+    // await this.repo.merge(element, updateDTO);
+    Object.keys(updateDTO).forEach((key) => {
+      element[key] = updateDTO[key];
+    });
+    await this.repo.save(element);
+    //@ts-expect-error
+    return await this.repo.findOneBy({ id });
   }
 
   async remove(id: number) {
     //@ts-expect-error
     const element = await this.repo.findOneBy({ id });
-    return this.repo.softRemove(element);
+    return await this.repo.softRemove(element);
   }
 
   async findFirst() {

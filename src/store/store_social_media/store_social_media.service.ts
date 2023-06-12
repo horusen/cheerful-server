@@ -15,6 +15,14 @@ export class StoreSocialMediaService extends BaseService<StoreSocialMedia> {
     super(_repo);
   }
 
+  async create(createDTO: any) {
+    const element = await this.repo.save(createDTO);
+    return await this.repo.findOne({
+      where: { id: element.id },
+      relations: ['social_media'],
+    });
+  }
+
   findByStoreId(storeId: number): Promise<StoreSocialMedia[]> {
     return this._repo.find({
       where: { store_id: storeId },

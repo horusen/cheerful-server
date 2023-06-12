@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -25,6 +26,7 @@ export class User extends BaseEntity {
   @Column()
   country_id: number;
 
+  @Exclude()
   @Column({
     nullable: true,
   })

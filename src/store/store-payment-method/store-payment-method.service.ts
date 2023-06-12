@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStorePaymentMethodDto } from './dto/create-store-payment-method.dto';
-import { UpdateStorePaymentMethodDto } from './dto/update-store-payment-method.dto';
 import { BaseService } from 'src/shared/services/base.service';
 import { StorePaymentMethod } from './entities/store-payment-method.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +11,18 @@ export class StorePaymentMethodService extends BaseService<StorePaymentMethod> {
     private readonly _repo: Repository<StorePaymentMethod>,
   ) {
     super(_repo);
+  }
+
+  async create(createDTO: any) {
+    const element = await this.repo.save(createDTO);
+    return await this.repo.findOne({
+      where: { id: element.id },
+      relations: {
+        payment_method_provider: {
+          type_payment_method_provider: true,
+        },
+      },
+    });
   }
 
   findByStoreId(storeId: number): Promise<StorePaymentMethod[]> {

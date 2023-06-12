@@ -13,6 +13,14 @@ export class StoreAddressService extends BaseService<StoreAddress> {
     super(_repo);
   }
 
+  async create(createDTO: any) {
+    const element = await this.repo.save(createDTO);
+    return await this.repo.findOne({
+      where: { id: element.id },
+      relations: ['city', 'state', 'country'],
+    });
+  }
+
   findByStoreId(storeId: number): Promise<StoreAddress[]> {
     return this._repo.find({
       where: { store_id: storeId },

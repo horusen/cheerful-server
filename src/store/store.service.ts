@@ -12,4 +12,13 @@ export class StoreService extends BaseService<Store> {
   ) {
     super(storeRepository);
   }
+
+  async createByUserId(userId: number) {
+    const element = await this.repo.save({ user_id: userId });
+    return await this.findOne(element.id);
+  }
+
+  async findByUserId(userId: number) {
+    return await this.repo.findOne({ where: { user_id: userId } });
+  }
 }

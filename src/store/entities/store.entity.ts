@@ -5,33 +5,38 @@ import { TypeStore } from 'src/type-store/entities/type-store.entity';
 
 @Entity()
 export class Store extends BaseEntity {
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   name: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   category_store_id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   type_store_id: number;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true, unique: true })
   phone_number: string;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true, unique: true })
   email: string;
 
-  @Column({ nullable: false })
+  @Column()
+  user_id: number;
+
+  @Column({ nullable: true })
   description: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   store_online_link: string;
 
   @Column({ nullable: true })
   store_logo_image: string;
 
-  @ManyToOne((type) => CategoryStore, (categoryStore) => categoryStore.id)
-  category: CategoryStore;
+  @ManyToOne((type) => CategoryStore, (categoryStore) => categoryStore.id, {
+    eager: true,
+  })
+  category_store: CategoryStore;
 
-  @ManyToOne((type) => TypeStore, (typeStore) => typeStore.id)
-  type: TypeStore;
+  @ManyToOne((type) => TypeStore, (typeStore) => typeStore.id, { eager: true })
+  type_store: TypeStore;
 }

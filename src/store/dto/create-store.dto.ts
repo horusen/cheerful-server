@@ -5,11 +5,9 @@ export class CreateStoreDto {
   name: string;
 
   @IsNotEmpty()
-  @IsInt()
   category_store_id: number;
 
   @IsNotEmpty()
-  @IsInt()
   type_store_id: number;
 
   @IsNotEmpty()
@@ -27,4 +25,7 @@ export class CreateStoreDto {
 
   @Allow()
   store_logo_image: string;
+
+  @IsNotEmpty()
+  user_id: number;
 }

@@ -22,5 +22,6 @@ import { StoreAddressModule } from './store-address/store-address.module';
   ],
   controllers: [StoreController],
   providers: [StoreService],
+  exports: [StoreService],
 })
 export class StoreModule {}
