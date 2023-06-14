@@ -1,8 +1,7 @@
+import { StoreCardModule } from './store-card/store-card.module';
 import { Module } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { StoreController } from './store.controller';
-import { CategoryStore } from './category_store/entities/category_store.entity';
-import { TypeStore } from 'src/type-store/entities/type-store.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Store } from './entities/store.entity';
 import { CategoryStoreModule } from './category_store/category_store.module';
@@ -21,6 +20,7 @@ import { FileModule } from 'src/file-service/file.module';
     StoreSocialMediaModule,
     StorePaymentMethodModule,
     StoreAddressModule,
+    StoreCardModule,
   ],
   controllers: [StoreController],
   providers: [StoreService],
