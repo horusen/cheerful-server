@@ -13,6 +13,7 @@ import { TypePaymentMethodProviderModule } from './type-payment-method-provider/
 import { PaymentMethodProviderModule } from './payment-method-provider/payment-method-provider.module';
 import { StateModule } from './state/state.module';
 import { CityModule } from './city/city.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { CityModule } from './city/city.module';
     PaymentMethodProviderModule,
     StateModule,
     CityModule,
+    OrderModule,
     
   ],
   controllers: [AppController],

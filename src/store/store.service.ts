@@ -16,6 +16,28 @@ export class StoreService extends BaseService<Store> {
     super(storeRepository);
   }
 
+  async findOne(id: number) {
+    const element = await this.repo.findOne({
+      where: { id },
+      relations: {
+        addresses: {
+          city: true,
+          state: true,
+          country: true,
+        },
+        payment_methods: {
+          payment_method_provider: {
+            type_payment_method_provider: true,
+          },
+        },
+      },
+    });
+
+    if (!element) throw new NotFoundException();
+
+    return element;
+  }
+
   async createByUserId(userId: number) {
     const element = await this.repo.save({ user_id: userId });
     return await this.findOne(element.id);

@@ -1,8 +1,10 @@
 import { File } from 'src/file-service/file.entity';
 import { BaseEntity } from 'src/shared/entities/base.entity';
+import { Store } from 'src/store/entities/store.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   JoinTableOptions,
   ManyToOne,
@@ -30,4 +32,7 @@ export class StoreCard extends BaseEntity {
     synchronize: false,
   } as JoinTableOptions)
   card_image: File;
+
+  @ManyToOne((type) => Store, (store) => store.id)
+  store: Store;
 }

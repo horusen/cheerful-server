@@ -1,6 +1,7 @@
 import { City } from 'src/city/entities/city.entity';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { State } from 'src/state/entities/state.entity';
+import { Store } from 'src/store/entities/store.entity';
 import { Country } from 'src/users/country/entities/country.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
@@ -32,4 +33,7 @@ export class StoreAddress extends BaseEntity {
 
   @ManyToOne((type) => Country, (country) => country.id)
   country: Country;
+
+  @ManyToOne((type) => Store, (store) => store.id)
+  store: Store;
 }

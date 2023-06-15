@@ -13,6 +13,11 @@ import {
 import { CategoryStore } from '../category_store/entities/category_store.entity';
 import { TypeStore } from 'src/type-store/entities/type-store.entity';
 import { File } from 'src/file-service/file.entity';
+import { Exclude, Expose } from 'class-transformer';
+import { StoreCardService } from '../store-card/store-card.service';
+import { StoreCard } from '../store-card/entities/store-card.entity';
+import { StoreAddress } from '../store-address/entities/store-address.entity';
+import { StorePaymentMethod } from '../store-payment-method/entities/store-payment-method.entity';
 
 @Entity()
 export class Store extends BaseEntity {
@@ -72,10 +77,31 @@ export class Store extends BaseEntity {
   } as JoinTableOptions)
   store_cover_image: File | File[];
 
-  // @AfterLoad()
-  // getStoreLogoImage() {
-  //   if (this.store_logo_image) {
-  //     this.store_logo_image = this.store_logo_image[0];
-  //   }
-  // }
+  @OneToMany((type) => StoreAddress, (storeAddress) => storeAddress.store)
+  addresses: StoreAddress[];
+
+  @OneToMany(
+    (type) => StorePaymentMethod,
+    (storePaymentMethod) => storePaymentMethod.store,
+  )
+  payment_methods: StorePaymentMethod[];
+
+  @Exclude()
+  @OneToMany((type) => StoreCard, (storeCard) => storeCard.store, {
+    eager: true,
+  })
+  cards: StoreCard[];
+
+  @Expose()
+  get card_min_price() {
+    return this.cards.reduce(
+      (min, p) => (p.min_price < min ? p.min_price : min),
+      this.cards[0]?.min_price || 0,
+    );
+  }
+
+  @Expose()
+  get card() {
+    return this.cards[0];
+  }
 }

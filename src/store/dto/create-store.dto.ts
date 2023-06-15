@@ -1,4 +1,6 @@
+import { Expose } from 'class-transformer';
 import { Allow, IsEmail, IsInt, IsNotEmpty, IsNumber } from 'class-validator';
+import { StoreCardService } from '../store-card/store-card.service';
 
 export class CreateStoreDto {
   @IsNotEmpty()
