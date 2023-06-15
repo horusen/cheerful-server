@@ -6,10 +6,13 @@ export class UserSignupDTO {
   name: string;
 
   @IsNotEmpty()
-  location: string;
+  country_id: number;
 
   @IsNotEmpty()
-  gender: string;
+  type_user_id: number;
+
+  @IsNotEmpty()
+  gender_id: number;
 
   @IsNotEmpty()
   phone_number: string;

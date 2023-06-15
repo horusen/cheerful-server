@@ -7,6 +7,13 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { DataSource } from 'typeorm';
 import configuration from 'config/configuration';
 import { AuthModule } from './auth/auth.module';
+import { StoreModule } from './store/store.module';
+import { SocialMediaModule } from './social-media/social-media.module';
+import { TypePaymentMethodProviderModule } from './type-payment-method-provider/type-payment-method-provider.module';
+import { PaymentMethodProviderModule } from './payment-method-provider/payment-method-provider.module';
+import { StateModule } from './state/state.module';
+import { CityModule } from './city/city.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -33,6 +40,14 @@ import { AuthModule } from './auth/auth.module';
       },
     }),
     AuthModule,
+    StoreModule,
+    SocialMediaModule,
+    TypePaymentMethodProviderModule,
+    PaymentMethodProviderModule,
+    StateModule,
+    CityModule,
+    OrderModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService],
