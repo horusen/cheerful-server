@@ -5,7 +5,7 @@ export default () => ({
   JWT_SECRET: process.env.JWT_SECRET,
   database: {
     type: 'mysql',
-    uri: process.env.MYSQL_URL || process.env.TYPEORM_URI,
+    uri: process.env.CLEARDB_DATABASE_URL || process.env.TYPEORM_URI,
   },
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
