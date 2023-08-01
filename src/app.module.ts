@@ -5,7 +5,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { DataSource } from 'typeorm';
+import { BusinessModule } from './business/business.module';
+import { CurrencyModule } from './currency/currency.module';
 import configuration from 'config/configuration';
+import { AuthModule } from './auth/auth.module';
+import { FileModule } from './file/file.module';
+import { Seeder } from './shared/seeders/seed';
+import { SeederModule } from './shared/seeders/seeder.module';
 
 @Module({
   imports: [
@@ -31,6 +37,10 @@ import configuration from 'config/configuration';
         return dataSource;
       },
     }),
+    BusinessModule,
+    CurrencyModule,
+    AuthModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService],
