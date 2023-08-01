@@ -48,6 +48,8 @@ export class AuthService {
       );
     }
 
+    // TODO: Send email verification
+
     const newUser = await this.usersService.create({
       ...userDTO,
       password: hashedPassword,
