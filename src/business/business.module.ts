@@ -7,6 +7,7 @@ import { BusinessTypeModule } from './business_type/business_type.module';
 import { BusinessIndustryModule } from './business_industry/business_industry.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Business } from './entities/business.entity';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
   controllers: [BusinessController],
@@ -16,6 +17,7 @@ import { Business } from './entities/business.entity';
     BusinessAdminModule,
     BusinessTypeModule,
     BusinessIndustryModule,
+    FileModule,
     TypeOrmModule.forFeature([Business]),
   ],
   exports: [BusinessService],

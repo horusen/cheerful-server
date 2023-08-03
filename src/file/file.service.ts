@@ -16,7 +16,7 @@ export class FileService {
     this._s3 = new S3();
   }
 
-  async uploadFile(databuffer: Buffer, filename: string) {
+  async uploadFile(databuffer: Buffer, filename: string, fileTypeId: number) {
     const uploadedFile = await this._s3
       .upload({
         Bucket: this.configService.get('AWS_S3_BUCKET_NAME'),
@@ -32,6 +32,7 @@ export class FileService {
     return await this.fileRepository.save({
       id: uploadedFile.Key,
       url: uploadedFile.Location,
+      file_type_id: fileTypeId,
     });
   }
 }

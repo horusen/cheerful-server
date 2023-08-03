@@ -5,6 +5,8 @@ import { BusinessType } from '../business_type/entities/business_type.entity';
 import { Country } from 'src/users/country/entities/country.entity';
 import { Currency } from 'src/currency/entities/currency.entity';
 import { User } from 'src/users/users.entity';
+import { BusinessIndustry } from '../business_industry/entities/business_industry.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Business extends BaseEntity {
@@ -12,48 +14,65 @@ export class Business extends BaseEntity {
   name: string;
 
   @Column({ nullable: true })
-  business_logo_id: number;
+  @Exclude()
+  business_logo_id: string;
 
   @Column({ nullable: true })
   email_address: string;
 
   @Column({ nullable: true })
+  @Exclude()
   type_business_id: number;
 
   @Column({ nullable: true })
+  @Exclude()
   industry_id: number;
 
   @Column({ nullable: true })
+  description: number;
+
+  @Column({ nullable: true })
+  @Exclude()
   country_id: number;
 
   @Column({ nullable: true })
+  @Exclude()
   currency_id: number;
 
   @Column({ nullable: false, default: 0 })
+  @Exclude()
   point_balance: number;
 
   @Column({ nullable: false })
   creator_id: number;
 
+  @Column({ nullable: false, default: false })
+  registration_completed: boolean;
+
   @ManyToOne((type) => File, (file) => file.id, {
-    eager: false,
+    eager: true,
   })
-  file: File;
+  business_logo: File;
 
   @ManyToOne((type) => BusinessType, (business_type) => business_type.id, {
-    eager: false,
+    eager: true,
   })
-  business_type: BusinessType;
+  type_business: BusinessType;
 
   @ManyToOne((type) => Country, (country) => country.id, {
-    eager: false,
+    eager: true,
   })
   country: Country;
 
   @ManyToOne((type) => Currency, (currency) => currency.id, {
-    eager: false,
+    eager: true,
   })
   currency: Currency;
+
+  @ManyToOne((type) => BusinessIndustry, (industry) => industry.id, {
+    eager: true,
+  })
+  industry: BusinessIndustry;
 
   @ManyToOne((type) => User, (user) => user.id, {
     eager: false,

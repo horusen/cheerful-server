@@ -8,24 +8,24 @@ import {
 } from 'typeorm';
 import { FileType } from './file_type/entities/file_type.entity';
 import { BaseEntity } from 'src/shared/entities/base.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class File {
   @PrimaryColumn()
   id: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   url: string;
-
-  @Column()
-  key: string;
 
   @Column()
   file_type_id: number;
 
+  @Exclude()
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 
+  @Exclude()
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 

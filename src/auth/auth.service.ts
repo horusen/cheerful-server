@@ -9,6 +9,7 @@ import { UserSignupDTO } from './dtos/user-signup.dto';
 import { File } from 'src/file/file.entity';
 import { FileService } from 'src/file/file.service';
 import { BusinessService } from 'src/business/business.service';
+import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
 // import { StoreService } from 'src/store/store.service';
 
 const RANDOM_BYTE_LENGTH = 8;
@@ -45,6 +46,7 @@ export class AuthService {
       image = await this.fileService.uploadFile(
         profilePic.buffer,
         profilePic.originalname,
+        FileTypeEnum.IMAGE,
       );
     }
 
