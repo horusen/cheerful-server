@@ -69,7 +69,7 @@ export class AuthService {
   }
 
   public async signin(email: string, password: string) {
-    const user = await this.usersService.find(email);
+    const user = await this.usersService.findByEmail(email);
 
     if (!user) throw new UnprocessableEntityException('User is not found');
 

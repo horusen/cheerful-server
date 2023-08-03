@@ -29,7 +29,7 @@ export class Business extends BaseEntity {
   industry_id: number;
 
   @Column({ nullable: true })
-  description: number;
+  description: string;
 
   @Column({ nullable: true })
   @Exclude()

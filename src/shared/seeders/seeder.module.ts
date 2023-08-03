@@ -7,6 +7,8 @@ import { CountryModule } from 'src/users/country/country.module';
 import { BusinessTypeModule } from 'src/business/business_type/business_type.module';
 import { BusinessIndustryModule } from 'src/business/business_industry/business_industry.module';
 import { FileTypeModule } from 'src/file/file_type/file_type.module';
+import { ConnectionTypeModule } from 'src/connection/connection-type/connection-type.module';
+import { InvitationStatusModule } from 'src/connection/invitation/invitation_status/invitation_status.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { FileTypeModule } from 'src/file/file_type/file_type.module';
     BusinessTypeModule,
     BusinessIndustryModule,
     FileTypeModule,
+    ConnectionTypeModule,
+    InvitationStatusModule,
   ],
   controllers: [],
   providers: [Seeder],

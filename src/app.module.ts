@@ -12,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
 import { FileModule } from './file/file.module';
 import { Seeder } from './shared/seeders/seed';
 import { SeederModule } from './shared/seeders/seeder.module';
+import { ConnectionModule } from './connection/connection.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { SeederModule } from './shared/seeders/seeder.module';
     CurrencyModule,
     AuthModule,
     SeederModule,
+    ConnectionModule,
+    GroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
