@@ -1,7 +1,7 @@
 // import { Store } from './../store/entities/store.entity';
 import { DeepPartial } from 'typeorm';
 import { UsersService } from './../users/users.service';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, Req, UnprocessableEntityException } from '@nestjs/common';
 import { randomBytes, scryptSync } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/users.entity';
@@ -10,6 +10,8 @@ import { File } from 'src/file/file.entity';
 import { FileService } from 'src/file/file.service';
 import { BusinessService } from 'src/business/business.service';
 import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
+import { EmailService } from 'src/shared/email/email.service';
+
 // import { StoreService } from 'src/store/store.service';
 
 const RANDOM_BYTE_LENGTH = 8;
@@ -17,11 +19,40 @@ const SCRYPT_HASH_LENGTH = 32;
 
 @Injectable()
 export class AuthService {
+  private _user: User | null = null;
+  private _userId: number | null = null;
+  private _businessId: number | null = null;
+
+  set user(user: User) {
+    this._user = user;
+  }
+
+  set userId(userId: number) {
+    this._userId = userId;
+  }
+
+  set businessId(businessId: number) {
+    this._businessId = businessId;
+  }
+
+  get user(): User {
+    return this._user;
+  }
+
+  get userId(): number {
+    return this._userId;
+  }
+
+  get businessId(): number {
+    return this._businessId;
+  }
+
   public constructor(
     public usersService: UsersService,
     public jwtService: JwtService,
     public fileService: FileService,
     public businessService: BusinessService,
+    public emailService: EmailService,
   ) {}
 
   async login(user: User): Promise<{ user: User; accessToken: string }> {
@@ -58,6 +89,8 @@ export class AuthService {
       profile_pic_id: image?.id,
     });
 
+    this.emailService.sendConfirmationEmail(newUser, 'token');
+
     if (userDTO.type_user_id == 2) {
       await this.businessService.create({
         name: userDTO.business_name,
@@ -87,5 +120,9 @@ export class AuthService {
     salt = salt || randomBytes(RANDOM_BYTE_LENGTH).toString('hex');
     const cryptedPassword = scryptSync(password, salt, SCRYPT_HASH_LENGTH);
     return `${salt}.${cryptedPassword}`;
+  }
+
+  getCurrentUser(@Req() req: Request) {
+    return req['user'];
   }
 }

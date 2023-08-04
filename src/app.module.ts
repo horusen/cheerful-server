@@ -14,6 +14,10 @@ import { Seeder } from './shared/seeders/seed';
 import { SeederModule } from './shared/seeders/seeder.module';
 import { ConnectionModule } from './connection/connection.module';
 import { GroupModule } from './group/group.module';
+import { EmailModule } from './shared/email/email.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtOauthGuard } from './auth/guard/jwt-oauth/jwt-oauth.guard';
+import { InvitationModule } from './connection/invitation/invitation.module';
 
 @Module({
   imports: [
@@ -45,8 +49,16 @@ import { GroupModule } from './group/group.module';
     SeederModule,
     ConnectionModule,
     GroupModule,
+    EmailModule,
+    InvitationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtOauthGuard,
+    },
+  ],
 })
 export class AppModule {}

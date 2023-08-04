@@ -16,6 +16,7 @@ export class User extends BaseEntity {
 
   @Column({
     unique: true,
+    nullable: true,
   })
   phone_number: string;
 
@@ -27,7 +28,7 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   gender_id: number;
 
-  @Column()
+  @Column({ nullable: true })
   country_id: number;
 
   @Exclude()

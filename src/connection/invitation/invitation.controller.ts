@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { InvitationService } from './invitation.service';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { UsersService } from 'src/users/users.service';
@@ -6,6 +14,7 @@ import { BusinessService } from 'src/business/business.service';
 import { User } from 'src/users/users.entity';
 import { Business } from 'src/business/entities/business.entity';
 import { ConnectionTypeEnum } from '../connection-type/connection-type.enum';
+import { InvitationStatusEnum } from './invitation_status/invitation_status.enum';
 
 @Controller('invitation')
 export class InvitationController {
@@ -16,13 +25,19 @@ export class InvitationController {
   ) {}
 
   @Get('sender/user/:id')
-  async getBySenderUserId(@Param('id') id: number) {
-    return await this.invitationService.getBySenderUserId(id);
+  async getBySenderUserId(
+    @Param('id') id: number,
+    @Query('status') status: string,
+  ) {
+    return await this.invitationService.getBySenderUserId(id, status);
   }
 
   @Get('sender/business/:id')
-  async getBySenderBusinessId(@Param('id') id: number) {
-    return await this.invitationService.getBySenderBusinessId(id);
+  async getBySenderBusinessId(
+    @Param('id') id: number,
+    @Query('status') status: string,
+  ) {
+    return await this.invitationService.getBySenderBusinessId(id, status);
   }
 
   @Get('receiver/:id')
@@ -39,16 +54,6 @@ export class InvitationController {
    */
   @Post()
   async create(@Body() createInvitationDto: CreateInvitationDto) {
-    // Find the receiver based on the receiver_id in the createInvitationDto
-    const receiver = await this.userService.findOne(
-      createInvitationDto.receiver_id,
-    );
-
-    // If the receiver does not exist, throw an error
-    if (!receiver) {
-      throw new Error('Receiver does not exist');
-    }
-
     let sender: User | Business;
 
     // Check the connection_type_id in the createInvitationDto
@@ -76,6 +81,14 @@ export class InvitationController {
 
     // Create the invitation using the createInvitationDto
     return await this.invitationService.create(createInvitationDto);
+  }
+
+  @Patch(':id/status/:status')
+  async updateStatus(
+    @Param('id') id: number,
+    @Param('status') status: InvitationStatusEnum,
+  ) {
+    return await this.invitationService.updateInvitationStatus(id, status);
   }
 
   /**

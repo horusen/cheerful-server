@@ -15,4 +15,7 @@ export class CreateInvitationDto {
 
   @IsNotEmpty()
   receiver_email_address: string;
+
+  @IsNotEmpty()
+  receiver_name: string;
 }

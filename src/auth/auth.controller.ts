@@ -14,7 +14,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserSignupDTO } from './dtos/user-signup.dto';
 import { UsersService } from 'src/users/users.service';
+import { Public } from 'src/shared/decorators/public.decorator';
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -27,8 +29,8 @@ export class AuthController {
     @Body() body: UserSignupDTO,
     @UploadedFile() profilePic: Express.Multer.File,
   ) {
-    const _user = await this.usersService.find(body.email);
-    if (_user) throw new UnprocessableEntityException('Email already in use');
+    const _user = await this.usersService.findByEmail(body.email);
+    if (_user) throw new UnprocessableEntityException('Email already in use ');
 
     return await this.authService.signup(body, profilePic);
   }

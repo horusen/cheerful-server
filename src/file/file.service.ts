@@ -25,7 +25,6 @@ export class FileService {
       })
       .promise()
       .catch((err) => {
-        console.log(err);
         throw new HttpException('Error uploading file', 500);
       });
 

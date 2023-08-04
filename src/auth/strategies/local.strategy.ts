@@ -17,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(email: string, password: string) {
-    const user = await this.userService.find(email);
+    const user = await this.userService.findByEmail(email);
 
     if (!user) throw new UnprocessableEntityException('User is not found');
 

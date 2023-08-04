@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Invitation } from './invitation.entity';
 import { BusinessModule } from 'src/business/business.module';
 import { UsersModule } from 'src/users/users.module';
+import { EmailModule } from 'src/shared/email/email.module';
+import { ConnectionModule } from '../connection.module';
 
 // TODO Add expiration for the invitation
 
@@ -17,6 +19,8 @@ import { UsersModule } from 'src/users/users.module';
     TypeOrmModule.forFeature([Invitation]),
     BusinessModule,
     UsersModule,
+    EmailModule,
+    ConnectionModule,
   ],
 })
 export class InvitationModule {}
