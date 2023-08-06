@@ -23,7 +23,6 @@ export class JwtOauthGuard extends AuthGuard('jwt') {
     context: ExecutionContext,
     status?: any,
   ): TUser {
-    console.log('test', user);
     this.sessionService.userId = user.id;
     this.sessionService.businessId = user.business.id;
 

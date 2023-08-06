@@ -12,7 +12,5 @@ export class AppService implements OnModuleInit {
 
   onModuleInit() {
     this.seeder.seed();
-
-    // console.log(decryptedQueryParams);
   }
 }
