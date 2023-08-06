@@ -29,9 +29,6 @@ export class AuthController {
     @Body() body: UserSignupDTO,
     @UploadedFile() profilePic: Express.Multer.File,
   ) {
-    const _user = await this.usersService.findByEmail(body.email);
-    if (_user) throw new UnprocessableEntityException('Email already in use ');
-
     return await this.authService.signup(body, profilePic);
   }
 

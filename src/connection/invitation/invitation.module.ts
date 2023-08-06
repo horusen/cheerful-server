@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { InvitationService } from './invitation.service';
 import { InvitationController } from './invitation.controller';
 import { InvitationStatusModule } from './invitation_status/invitation_status.module';
@@ -8,6 +8,7 @@ import { BusinessModule } from 'src/business/business.module';
 import { UsersModule } from 'src/users/users.module';
 import { EmailModule } from 'src/shared/email/email.module';
 import { ConnectionModule } from '../connection.module';
+import { SessionModule } from 'src/session/session.module';
 
 // TODO Add expiration for the invitation
 
@@ -21,6 +22,8 @@ import { ConnectionModule } from '../connection.module';
     UsersModule,
     EmailModule,
     ConnectionModule,
+    SessionModule,
   ],
+  exports: [InvitationService],
 })
 export class InvitationModule {}

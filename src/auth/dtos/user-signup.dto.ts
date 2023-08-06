@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { IsRequiredIf } from 'src/shared/validators/is-required-if.validator';
 import { SameValue } from 'src/shared/validators/same-value.validator';
+import { TypeUserEnum } from 'src/users/type-users/type-user.enum';
 
 export class UserSignupDTO {
   @IsNotEmpty()
@@ -20,10 +21,14 @@ export class UserSignupDTO {
   @IsIn([1, 2, 3])
   type_user_id: number;
 
-  @IsRequiredIf('type_user_id', 1)
-  @ValidateIf((o) => o.type_user_id === 1)
+  @ValidateIf((o) => o.type_user_id === TypeUserEnum.Individual)
+  @IsNotEmpty()
   @IsIn([1, 2, 3])
   gender_id: number;
+
+  @ValidateIf((o) => o.type_user_id === TypeUserEnum.Individual)
+  @IsNotEmpty()
+  invitation_id: number;
 
   @IsNotEmpty()
   phone_number: string;

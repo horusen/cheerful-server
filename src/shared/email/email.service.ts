@@ -1,6 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AES, enc } from 'crypto-js';
 import { Business } from 'src/business/entities/business.entity';
 import { User } from 'src/users/users.entity';
 
@@ -13,7 +14,7 @@ export class EmailService {
 
   sendConfirmationEmail(user: User, token: string) {
     const confirmationUrl = `${this.configService.get(
-      'BASE_URL',
+      'FRONTEND_URL',
     )}/auth/confirm?token=${token}`;
 
     this.emailService.sendMail({
@@ -31,10 +32,19 @@ export class EmailService {
     sender: User | Business,
     receiver_name: string,
     receiver_email_address: string,
+    invitationId: number,
   ) {
+    const queryParams =
+      `email=${receiver_email_address}&name=${receiver_name}&invitation=${invitationId}`.replace(
+        ' ',
+        '+',
+      );
+
+    // TODO: encrypt the URL before sending it to the frontend
+
     const registrationUrl = `${this.configService.get(
-      'BASE_URL',
-    )}/authentication/signup?type-user=1&email=${receiver_email_address}`;
+      'FRONTEND_URL',
+    )}/authentication/join?${queryParams}`;
 
     this.emailService.sendMail({
       to: receiver_email_address,

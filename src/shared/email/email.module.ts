@@ -18,7 +18,7 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
           },
         },
         defaults: {
-          from: `Cheerful <${config.get('MAIL_FROM')}>`,
+          from: `Cheerful <${config.get('SMTP_USERNAME')}>`,
         },
         template: {
           dir: 'src/shared/email/templates',

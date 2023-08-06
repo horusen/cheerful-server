@@ -3,6 +3,7 @@ import { BaseEntity } from 'src/shared/entities/base.entity';
 import { User } from 'src/users/users.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { ConnectionType } from '../connection-type/connection-type.entity';
+import { truncate } from 'fs/promises';
 @Entity()
 export class Connection extends BaseEntity {
   @Column({ nullable: false })
@@ -11,7 +12,7 @@ export class Connection extends BaseEntity {
   @Column({ nullable: false })
   user1_id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   user2_id: number;
 
   @Column({ nullable: false })

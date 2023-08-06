@@ -86,9 +86,13 @@ export class InvitationController {
   @Patch(':id/status/:status')
   async updateStatus(
     @Param('id') id: number,
-    @Param('status') status: InvitationStatusEnum,
+    @Param('status') status: 'accepted' | 'aborted',
   ) {
-    return await this.invitationService.updateInvitationStatus(id, status);
+    let _status =
+      status == 'accepted'
+        ? InvitationStatusEnum.Accepted
+        : InvitationStatusEnum.Aborted;
+    return await this.invitationService.updateInvitationStatus(id, _status);
   }
 
   /**

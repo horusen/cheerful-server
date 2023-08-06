@@ -18,6 +18,7 @@ import { EmailModule } from './shared/email/email.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtOauthGuard } from './auth/guard/jwt-oauth/jwt-oauth.guard';
 import { InvitationModule } from './connection/invitation/invitation.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { InvitationModule } from './connection/invitation/invitation.module';
     GroupModule,
     EmailModule,
     InvitationModule,
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [

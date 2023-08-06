@@ -1,6 +1,6 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, forwardRef } from '@nestjs/common';
 import { UsersModule } from 'src/users/users.module';
 import { AuthService } from './auth.service';
 
@@ -10,6 +10,8 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { FileModule } from 'src/file/file.module';
 import { BusinessModule } from 'src/business/business.module';
 import { EmailModule } from 'src/shared/email/email.module';
+import { InvitationModule } from 'src/connection/invitation/invitation.module';
+import { SessionModule } from 'src/session/session.module';
 
 @Global()
 @Module({
@@ -18,6 +20,8 @@ import { EmailModule } from 'src/shared/email/email.module';
     FileModule,
     BusinessModule,
     EmailModule,
+    InvitationModule,
+    SessionModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
