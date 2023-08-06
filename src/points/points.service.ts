@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/shared/services/base.service';
 import { Repository } from 'typeorm';
-import { PointLoadHistory } from './point-load-history.entity';
+import { PointLoadHistory } from './entities/point-load-history.entity';
 import { LoadPointDTO } from './dto/load-point.dto';
 import { UsersService } from 'src/users/users.service';
 import { BusinessService } from 'src/business/business.service';
@@ -34,6 +34,32 @@ export class PointsService extends BaseService<PointLoadHistory> {
       );
     }
 
-    return await this._repo.save({ ...dto, date: new Date() });
+    return await this._repo.save({
+      ...dto,
+      amount: dto.amount * 0.9,
+      date: new Date(),
+    });
+  }
+
+  async getHistoryByUserId(userId: number) {
+    return this._repo.find({
+      where: {
+        entity_user_id: userId,
+      },
+      order: {
+        date: 'DESC',
+      },
+    });
+  }
+
+  async getHistoryByBusinessId(businessId: number) {
+    return this._repo.find({
+      where: {
+        entity_business_id: businessId,
+      },
+      order: {
+        date: 'DESC',
+      },
+    });
   }
 }
