@@ -97,13 +97,9 @@ export class InvitationService extends BaseService<Invitation> {
   private async _accetpInvitation(invitationId: number) {
     let invitation = await this.repo.findOne({ where: { id: invitationId } });
     if (!invitation) throw new HttpException('Invitation not found', 404);
-    console.log(invitation.id, this.sessionService.userId);
 
     invitation.status_id = InvitationStatusEnum.Accepted;
-    console.log('invitation1', invitation);
     invitation = await this._repo.save(invitation);
-
-    console.log('invitation2', invitation);
 
     await this.createConnection(invitation);
 
@@ -156,7 +152,6 @@ export class InvitationService extends BaseService<Invitation> {
     } else {
       connection['business_id'] = sender_business_id;
     }
-    console.log(connection);
 
     return this.connectionService.create(connection);
   }
