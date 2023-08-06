@@ -21,7 +21,6 @@ export class Business extends BaseEntity {
   email_address: string;
 
   @Column({ nullable: true })
-  @Exclude()
   type_business_id: number;
 
   @Column({ nullable: true })

@@ -4,14 +4,17 @@ import { User } from 'src/users/users.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { ConnectionType } from '../connection-type/connection-type.entity';
 import { truncate } from 'fs/promises';
+import { Exclude } from 'class-transformer';
 @Entity()
 export class Connection extends BaseEntity {
   @Column({ nullable: false })
   connection_type_id: number;
 
+  @Exclude()
   @Column({ nullable: false })
   user1_id: number;
 
+  @Exclude()
   @Column({ nullable: true })
   user2_id: number;
 

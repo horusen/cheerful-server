@@ -24,7 +24,7 @@ export class JwtOauthGuard extends AuthGuard('jwt') {
     status?: any,
   ): TUser {
     this.sessionService.userId = user.id;
-    this.sessionService.businessId = user.business.id;
+    this.sessionService.businessId = user.business?.id;
 
     return user;
   }

@@ -16,6 +16,29 @@ export class ConnectionService extends BaseService<Connection> {
     super(_repo);
   }
 
+  getByBusiness(businessId: number) {
+    return this._repo.find({
+      where: {
+        business_id: businessId,
+      },
+      relations: ['user1', 'user2'],
+    });
+  }
+
+  getByUser(userId: number) {
+    return this._repo.find({
+      where: [
+        {
+          user1_id: userId,
+        },
+        {
+          user2_id: userId,
+        },
+      ],
+      relations: ['user1', 'user2', 'business'],
+    });
+  }
+
   create(createConnectionDto: CreateConnectionDto) {
     let data: CreateConnectionDto = {
       user1_id: createConnectionDto.user1_id,
