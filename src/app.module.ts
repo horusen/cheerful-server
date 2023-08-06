@@ -19,6 +19,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtOauthGuard } from './auth/guard/jwt-oauth/jwt-oauth.guard';
 import { InvitationModule } from './connection/invitation/invitation.module';
 import { SessionModule } from './session/session.module';
+import { PointsModule } from './points/points.module';
+import { EntityTypeModule } from './entity-type/entity-type.module';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { SessionModule } from './session/session.module';
     EmailModule,
     InvitationModule,
     SessionModule,
+    PointsModule,
+    EntityTypeModule,
   ],
   controllers: [AppController],
   providers: [

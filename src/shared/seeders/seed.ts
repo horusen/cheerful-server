@@ -9,6 +9,7 @@ import { BusinessIndustrySeeder } from 'src/business/business_industry/industry.
 import { FileTypeSeeder } from 'src/file/file_type/file_type.seeder';
 import { ConnectionTypeSeeder } from 'src/connection/connection-type/connection-type.seeder';
 import { InvitationStatusSeeder } from 'src/connection/invitation/invitation_status/invitation_status.seeder';
+import { EntityTypeSeeder } from 'src/entity-type/entity-type.seeder';
 
 @Injectable()
 export class Seeder {
@@ -22,6 +23,7 @@ export class Seeder {
     public fileTypeSeeder: FileTypeSeeder,
     public connectionTypeSeeder: ConnectionTypeSeeder,
     public invitationStatusSeeder: InvitationStatusSeeder,
+    public entityTypeSeeder: EntityTypeSeeder,
   ) {}
 
   async seed() {
@@ -34,5 +36,6 @@ export class Seeder {
     await this.fileTypeSeeder.seed();
     await this.connectionTypeSeeder.seed();
     await this.invitationStatusSeeder.seed();
+    await this.entityTypeSeeder.seed();
   }
 }

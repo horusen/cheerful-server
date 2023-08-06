@@ -8,12 +8,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileService } from 'src/file/file.service';
 import { File } from 'src/file/file.entity';
 import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BusinessService extends BaseService<Business> {
   constructor(
     @InjectRepository(Business) private readonly _repo: Repository<Business>,
     public fileService: FileService,
+    public configService: ConfigService,
   ) {
     super(_repo);
   }
@@ -61,5 +63,17 @@ export class BusinessService extends BaseService<Business> {
     await this.repo.save(element);
 
     return await this.findOne(id);
+  }
+
+  async updatePointBalance(businessId: number, moneyAmount: number) {
+    const business = await this.findOne(businessId);
+
+    if (!business) {
+      throw new NotFoundException('Business not found');
+    }
+
+    business.point_balance +=
+      moneyAmount * this.configService.get('MONEY_TO_POINT_RATIO');
+    return await this.repo.save(business);
   }
 }

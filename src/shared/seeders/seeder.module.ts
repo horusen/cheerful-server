@@ -9,6 +9,7 @@ import { BusinessIndustryModule } from 'src/business/business_industry/business_
 import { FileTypeModule } from 'src/file/file_type/file_type.module';
 import { ConnectionTypeModule } from 'src/connection/connection-type/connection-type.module';
 import { InvitationStatusModule } from 'src/connection/invitation/invitation_status/invitation_status.module';
+import { EntityTypeModule } from 'src/entity-type/entity-type.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { InvitationStatusModule } from 'src/connection/invitation/invitation_sta
     FileTypeModule,
     ConnectionTypeModule,
     InvitationStatusModule,
+    EntityTypeModule
   ],
   controllers: [],
   providers: [Seeder],

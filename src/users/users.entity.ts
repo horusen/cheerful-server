@@ -46,7 +46,7 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   profile_pic_id: number;
 
-  @Column({ nullable: false, default: 0 })
+  @Column({ nullable: false, default: 0, type: 'double' })
   point_balance: number;
 
   @ManyToOne((type) => File, (profile_pic) => profile_pic.id, {
