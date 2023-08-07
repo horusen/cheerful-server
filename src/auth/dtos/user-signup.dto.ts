@@ -1,6 +1,7 @@
 import {
   Allow,
   IsEmail,
+  IsEnum,
   IsIn,
   IsNotEmpty,
   Validate,
@@ -18,7 +19,7 @@ export class UserSignupDTO {
   country_id: number;
 
   @IsNotEmpty()
-  @IsIn([1, 2, 3])
+  @IsEnum(TypeUserEnum)
   type_user_id: number;
 
   @ValidateIf((o) => o.type_user_id === TypeUserEnum.Individual)
@@ -44,8 +45,13 @@ export class UserSignupDTO {
   @Allow()
   password_confirmation: string;
 
-  @Allow()
+  @ValidateIf((o) => o.type_user_id === TypeUserEnum.BusinessAdmin)
+  @IsNotEmpty()
   business_name: string;
+
+  @ValidateIf((o) => o.type_user_id === TypeUserEnum.Merchant)
+  @IsNotEmpty()
+  store_name: string;
 
   @Allow()
   profile_pic: string;

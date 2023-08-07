@@ -21,6 +21,7 @@ export class TypeUserSeeder extends BaseSeeder<TypeUser> {
       },
       {
         name: 'merchant',
+        description: 'A user that have created and manage a store',
       },
     ]);
   }
