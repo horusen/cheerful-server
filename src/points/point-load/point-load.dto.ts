@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { EntityTypeEnum } from 'src/entity-type/entity-type.enum';
 
-export class LoadPointDTO {
+export class PointLoadDTO {
   @IsNotEmpty()
   @IsEnum(EntityTypeEnum)
   entity_type_id: number;

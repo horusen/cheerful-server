@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PointsService } from './points.service';
+import { PointsService } from './point-load/points-load.service';
 
 describe('PointsService', () => {
   let service: PointsService;

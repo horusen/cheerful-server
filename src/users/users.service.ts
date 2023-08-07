@@ -8,7 +8,10 @@ import { DeepPartial, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService extends BaseService<User> {
-  constructor(@InjectRepository(User) public readonly repo: Repository<User>, public configService: ConfigService) {
+  constructor(
+    @InjectRepository(User) public readonly repo: Repository<User>,
+    public configService: ConfigService,
+  ) {
     super(repo);
   }
 
@@ -16,14 +19,20 @@ export class UsersService extends BaseService<User> {
     return this.repo.findOne({ where: { email } });
   }
 
-  async updatePointBalance(userId: number, moneyAmount: number) {
+  async updatePointBalance(
+    userId: number,
+    moneyAmount: number,
+    increment = true,
+  ) {
     const user = await this.findOne(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    user.point_balance += moneyAmount * this.configService.get('MONEY_TO_POINT_RATIO');
+    if (increment) user.point_balance += moneyAmount;
+    else user.point_balance -= moneyAmount;
+
     return await this.repo.save(user);
   }
 }

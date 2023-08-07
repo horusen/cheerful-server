@@ -65,15 +65,20 @@ export class BusinessService extends BaseService<Business> {
     return await this.findOne(id);
   }
 
-  async updatePointBalance(businessId: number, moneyAmount: number) {
+  async updatePointBalance(
+    businessId: number,
+    moneyAmount: number,
+    increment = true,
+  ) {
     const business = await this.findOne(businessId);
 
     if (!business) {
       throw new NotFoundException('Business not found');
     }
 
-    business.point_balance +=
-      moneyAmount * this.configService.get('MONEY_TO_POINT_RATIO');
+    if (increment) business.point_balance += moneyAmount;
+    else business.point_balance -= moneyAmount;
+
     return await this.repo.save(business);
   }
 }

@@ -1,7 +1,11 @@
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { Entity, Column } from 'typeorm';
+
+/*
+ * Record of the points loaded by a Business or an individual
+ */
 @Entity()
-export class PointLoadHistory extends BaseEntity {
+export class PointLoad extends BaseEntity {
   @Column({ nullable: false })
   entity_type_id: number;
 

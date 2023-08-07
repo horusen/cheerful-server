@@ -2,18 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/shared/services/base.service';
 import { Repository } from 'typeorm';
-import { PointLoadHistory } from './entities/point-load-history.entity';
-import { LoadPointDTO } from './dto/load-point.dto';
+import { PointLoad } from './point-load-history.entity';
+import { PointLoadDTO } from './point-load.dto';
 import { UsersService } from 'src/users/users.service';
 import { BusinessService } from 'src/business/business.service';
 import { EntityTypeEnum } from 'src/entity-type/entity-type.enum';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class PointsService extends BaseService<PointLoadHistory> {
+export class PointsLoadService extends BaseService<PointLoad> {
   constructor(
-    @InjectRepository(PointLoadHistory)
-    private readonly _repo: Repository<PointLoadHistory>,
+    @InjectRepository(PointLoad)
+    private readonly _repo: Repository<PointLoad>,
     public userService: UsersService,
     public businessService: BusinessService,
     public configService: ConfigService,
@@ -21,16 +21,19 @@ export class PointsService extends BaseService<PointLoadHistory> {
     super(_repo);
   }
 
-  async loadPoints(dto: LoadPointDTO) {
+  async loadPoints(dto: PointLoadDTO) {
     const isUserEntity = dto.entity_type_id == EntityTypeEnum.User;
     const isBusinessEntity = dto.entity_type_id == EntityTypeEnum.Business;
 
     if (isUserEntity) {
-      await this.userService.updatePointBalance(dto.entity_user_id, dto.amount);
+      await this.userService.updatePointBalance(
+        dto.entity_user_id,
+        dto.amount * this.configService.get('MONEY_TO_POINT_RATIO'),
+      );
     } else if (isBusinessEntity) {
       await this.businessService.updatePointBalance(
         dto.entity_business_id,
-        dto.amount,
+        dto.amount * this.configService.get('MONEY_TO_POINT_RATIO'),
       );
     }
 
