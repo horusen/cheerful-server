@@ -1,0 +1,21 @@
+<p>Hello <%= receiver_name
+        %>,</p>
+<p>
+    Good news! <%= sender.name
+        %> has invited you to join Cheerful.
+</p>
+
+<p>To get started, <a href="<%= registration_url %>">click here</a></p>
+<p>
+    <a href="<%= registration_url %>">Confirm you account</a>
+</p>
+
+<p>
+    If you're having trouble clicking the confirm account button, copy and paste
+    the below URL into your web browser.
+</p>
+
+<a href="<%= registration_url %>">
+    <%= registration_url
+        %>
+</a>
