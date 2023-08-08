@@ -20,6 +20,7 @@ import { EmailService } from 'src/shared/email/email.service';
 import { TypeUserEnum } from 'src/users/type-users/type-user.enum';
 import { InvitationService } from 'src/connection/invitation/invitation.service';
 import { InvitationStatusEnum } from 'src/connection/invitation/invitation_status/invitation_status.enum';
+import { StoreService } from 'src/store/store.service';
 
 // import { StoreService } from 'src/store/store.service';
 
@@ -35,6 +36,7 @@ export class AuthService {
     public businessService: BusinessService,
     public emailService: EmailService,
     public invitationService: InvitationService,
+    public storeService: StoreService,
   ) {}
 
   async login(user: User): Promise<{ user: User; accessToken: string }> {
@@ -45,6 +47,10 @@ export class AuthService {
       const business = await this.businessService.findByCreatorId(user.id);
       payload['business'] = business;
       response['business'] = business;
+    } else if (user.type_user_id == TypeUserEnum.Merchant) {
+      const store = await this.storeService.findByCreatorId(user.id);
+      payload['store'] = store;
+      response['store'] = store;
     }
     return { ...response, accessToken: this.jwtService.sign(payload) };
   }
@@ -58,25 +64,7 @@ export class AuthService {
 
     // TODO: Send email verification
 
-    if (userDTO.type_user_id == TypeUserEnum.BusinessAdmin) {
-      const _user = await this.usersService.findByEmail(userDTO.email);
-      if (_user)
-        throw new UnprocessableEntityException('Email already in use ');
-
-      if (profilePic) {
-        image = await this._saveProfilePic(profilePic);
-      }
-      user = await this.usersService.create({
-        ...userDTO,
-        password: hashedPassword,
-        profile_pic_id: image?.id,
-      });
-
-      await this.businessService.create({
-        name: userDTO.business_name,
-        creator_id: user.id,
-      });
-    } else if (userDTO.type_user_id == TypeUserEnum.Individual) {
+    if (userDTO.type_user_id == TypeUserEnum.Individual) {
       user = await this.usersService.findByEmail(userDTO.email);
 
       if (!user) throw new UnprocessableEntityException('User is  not found');
@@ -95,6 +83,30 @@ export class AuthService {
         password: hashedPassword,
         profile_pic_id: image?.id,
       });
+    } else {
+      const _user = await this.usersService.findByEmail(userDTO.email);
+      if (_user)
+        throw new UnprocessableEntityException('Email already in use ');
+
+      if (profilePic) {
+        image = await this._saveProfilePic(profilePic);
+      }
+      user = await this.usersService.create({
+        ...userDTO,
+        password: hashedPassword,
+        profile_pic_id: image?.id,
+      });
+
+      if (userDTO.type_user_id == TypeUserEnum.BusinessAdmin)
+        await this.businessService.create({
+          name: userDTO.business_name,
+          creator_id: user.id,
+        });
+      else if (userDTO.type_user_id == TypeUserEnum.Merchant)
+        await this.storeService.create({
+          name: userDTO.store_name,
+          creator_id: user.id,
+        });
     }
 
     return this.login(user);

@@ -10,6 +10,10 @@ import { FileTypeModule } from 'src/file/file_type/file_type.module';
 import { ConnectionTypeModule } from 'src/connection/connection-type/connection-type.module';
 import { InvitationStatusModule } from 'src/connection/invitation/invitation_status/invitation_status.module';
 import { EntityTypeModule } from 'src/entity-type/entity-type.module';
+import { StateModule } from 'src/state/state.module';
+import { SocialMediaModule } from 'src/social-media/social-media.module';
+import { TypeStoreModule } from 'src/store/type-store/type-store.module';
+import { CategoryStoreModule } from 'src/store/category_store/category_store.module';
 
 @Module({
   imports: [
@@ -22,7 +26,11 @@ import { EntityTypeModule } from 'src/entity-type/entity-type.module';
     FileTypeModule,
     ConnectionTypeModule,
     InvitationStatusModule,
-    EntityTypeModule
+    EntityTypeModule,
+    StateModule,
+    SocialMediaModule,
+    TypeStoreModule,
+    CategoryStoreModule,
   ],
   controllers: [],
   providers: [Seeder],

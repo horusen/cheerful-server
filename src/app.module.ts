@@ -21,6 +21,7 @@ import { InvitationModule } from './connection/invitation/invitation.module';
 import { SessionModule } from './session/session.module';
 import { PointsModule } from './points/points.module';
 import { EntityTypeModule } from './entity-type/entity-type.module';
+import { StoreModule } from './store/store.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { EntityTypeModule } from './entity-type/entity-type.module';
     SessionModule,
     PointsModule,
     EntityTypeModule,
+    StoreModule,
   ],
   controllers: [AppController],
   providers: [

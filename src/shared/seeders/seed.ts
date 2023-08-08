@@ -1,3 +1,4 @@
+import { StateSeeder } from './../../state/state.seeder';
 import { GenderSeeder } from 'src/users/gender/gender.seeder';
 import { TypeUserSeeder } from '../../users/type-users/type-user.seeder';
 import { Injectable } from '@nestjs/common';
@@ -10,6 +11,9 @@ import { FileTypeSeeder } from 'src/file/file_type/file_type.seeder';
 import { ConnectionTypeSeeder } from 'src/connection/connection-type/connection-type.seeder';
 import { InvitationStatusSeeder } from 'src/connection/invitation/invitation_status/invitation_status.seeder';
 import { EntityTypeSeeder } from 'src/entity-type/entity-type.seeder';
+import { SocialMediaSeeder } from 'src/social-media/social-media.seeder';
+import { CategoryStoreSeeder } from 'src/store/category_store/category_store.seeder';
+import { TypeStoreSeeder } from 'src/store/type-store/type-store.seeder';
 
 @Injectable()
 export class Seeder {
@@ -24,6 +28,10 @@ export class Seeder {
     public connectionTypeSeeder: ConnectionTypeSeeder,
     public invitationStatusSeeder: InvitationStatusSeeder,
     public entityTypeSeeder: EntityTypeSeeder,
+    public socialMediaSeeder: SocialMediaSeeder,
+    public stateSeeder: StateSeeder,
+    public categoryStoreSeeder: CategoryStoreSeeder,
+    public typeStoreSeeder: TypeStoreSeeder,
   ) {}
 
   async seed() {
@@ -37,5 +45,9 @@ export class Seeder {
     await this.connectionTypeSeeder.seed();
     await this.invitationStatusSeeder.seed();
     await this.entityTypeSeeder.seed();
+    await this.stateSeeder.seed();
+    await this.socialMediaSeeder.seed();
+    await this.categoryStoreSeeder.seed();
+    await this.typeStoreSeeder.seed();
   }
 }
