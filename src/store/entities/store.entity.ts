@@ -16,6 +16,7 @@ import { StoreSocialMedia } from '../store_social_media/entities/store_social_me
 import { TypeStore } from '../type-store/entities/type-store.entity';
 import { File } from 'src/file/file.entity';
 import { User } from 'src/users/users.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Store extends BaseEntity {
@@ -43,9 +44,11 @@ export class Store extends BaseEntity {
   @Column({ nullable: true })
   online_link: string;
 
+  @Exclude()
   @Column({ nullable: true })
   logo_id: string;
 
+  @Exclude()
   @Column({ nullable: true })
   cover_id: string;
 
@@ -73,7 +76,7 @@ export class Store extends BaseEntity {
     name: 'store_file',
     synchronize: false,
   } as JoinTableOptions)
-  logo_image: File | File[];
+  logo: File | File[];
 
   @ManyToOne((type) => File, { nullable: true, eager: true })
   @JoinTable({
@@ -82,11 +85,13 @@ export class Store extends BaseEntity {
     name: 'store_file',
     synchronize: false,
   } as JoinTableOptions)
-  cover_image: File | File[];
+  cover: File | File[];
 
   @OneToMany((type) => StoreSocialMedia, (socialMedia) => socialMedia.store)
   social_medias: StoreSocialMedia[];
 
-  @OneToMany((type) => StoreAddress, (storeAddress) => storeAddress.store)
+  @OneToMany((type) => StoreAddress, (storeAddress) => storeAddress.store, {
+    eager: true,
+  })
   addresses: StoreAddress[];
 }

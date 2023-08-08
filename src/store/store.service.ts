@@ -34,6 +34,7 @@ export class StoreService extends BaseService<Store> {
     const element = await this.repo.findOne({
       where: { id },
       relations: {
+        social_medias: true,
         addresses: {
           state: true,
           country: true,
