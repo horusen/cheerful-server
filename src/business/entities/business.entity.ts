@@ -39,7 +39,6 @@ export class Business extends BaseEntity {
   currency_id: number;
 
   @Column({ nullable: false, default: 0, type: 'double' })
-  @Exclude()
   point_balance: number;
 
   @Column({ nullable: false })
