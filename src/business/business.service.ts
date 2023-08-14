@@ -9,6 +9,9 @@ import { FileService } from 'src/file/file.service';
 import { File } from 'src/file/file.entity';
 import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
 import { ConfigService } from '@nestjs/config';
+import { PointsLoadService } from 'src/points/point-load/points-load.service';
+import { PointTransfertService } from 'src/points/point-transfert/point-transfert.service';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class BusinessService extends BaseService<Business> {

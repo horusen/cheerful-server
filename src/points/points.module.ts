@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PointsController } from './points.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/users/users.module';
@@ -18,5 +18,6 @@ import { PointExchange } from './point-exchanged/point-exchanged.entity';
   ],
   controllers: [PointsController],
   providers: [PointsLoadService, PointTransfertService, PointExchangedService],
+  exports: [PointTransfertService],
 })
 export class PointsModule {}

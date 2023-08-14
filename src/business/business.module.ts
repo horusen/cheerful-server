@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { BusinessController } from './business.controller';
 import { EmployeeModule } from './employee/employee.module';
@@ -8,6 +8,7 @@ import { BusinessIndustryModule } from './business_industry/business_industry.mo
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Business } from './entities/business.entity';
 import { FileModule } from 'src/file/file.module';
+import { PointsModule } from 'src/points/points.module';
 
 @Module({
   controllers: [BusinessController],

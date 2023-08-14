@@ -78,8 +78,6 @@ export class StoreService extends BaseService<Store> {
     logoImage?: Express.Multer.File,
     coverImage?: Express.Multer.File,
   ) {
-    console.log(logoImage);
-    console.log(coverImage);
     const element = await this.repo.findOneBy({ id });
     if (!element) throw new NotFoundException();
 
