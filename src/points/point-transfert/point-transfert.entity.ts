@@ -23,6 +23,9 @@ export class PointTransfert extends BaseEntity {
   @Column({ nullable: false })
   receiver_id: number;
 
+  @Column({ nullable: true })
+  message: string;
+
   @ManyToOne(() => EntityType, (entityType) => entityType.id)
   sender_entity_type: EntityType;
 

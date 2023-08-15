@@ -72,7 +72,6 @@ export class PointTransfertService extends BaseService<PointTransfert> {
   }
 
   private async bulkCreate(data: PointTransfertDTO) {
-    console.log(data);
     const transferts: PointTransfert[] = [];
     for await (const element of data.receiver_ids) {
       const item = await this.create({ ...data, receiver_id: element });
@@ -89,6 +88,7 @@ export class PointTransfertService extends BaseService<PointTransfert> {
       sender_entity_type_id: data.sender_entity_type_id,
       amount: data.amount,
       date: new Date(),
+      message: data.message,
     };
 
     if (data.sender_entity_type_id === EntityTypeEnum.User) {
