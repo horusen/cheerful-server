@@ -6,7 +6,7 @@ import {
 import { BaseService } from 'src/shared/services/base.service';
 import { PointTransfert } from './point-transfert.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PointTransfertDTO } from './point-transfert.dto';
 import { EntityTypeEnum } from 'src/entity-type/entity-type.enum';
 import { UsersService } from 'src/users/users.service';
@@ -72,6 +72,7 @@ export class PointTransfertService extends BaseService<PointTransfert> {
   }
 
   private async bulkCreate(data: PointTransfertDTO) {
+    console.log(data);
     const transferts: PointTransfert[] = [];
     for await (const element of data.receiver_ids) {
       const item = await this.create({ ...data, receiver_id: element });
@@ -123,31 +124,6 @@ export class PointTransfertService extends BaseService<PointTransfert> {
 
   async getByBusiness(businessId: number) {
     return await this._repo.find({ where: { sender_business_id: businessId } });
-  }
-
-  // Get all tranferts for this month
-  async getTranfertsForThisMonthByBusinessId(sender_business_id: number) {
-    return await this._repo.find({
-      where: {
-        sender_business_id,
-        date: Between(
-          new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          new Date(),
-        ),
-      },
-    });
-  }
-
-  async getTranfertsForThisMonthByUserId(sender_user_id: number) {
-    return await this._repo.find({
-      where: {
-        sender_user_id,
-        date: Between(
-          new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          new Date(),
-        ),
-      },
-    });
   }
 
   // async findOne(id: number) {

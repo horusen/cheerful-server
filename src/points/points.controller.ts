@@ -40,11 +40,4 @@ export class PointsController {
   async getTransfertByUserId(@Param('userId') userId: number) {
     return await this.pointTransfertService.getByUser(userId);
   }
-
-  @Get('business/:businessId/stats')
-  async getStatsByBusinessId(@Param('businessId') businessId: number) {
-    return await this.pointTransfertService.getTranfertsForThisMonthByBusinessId(
-      businessId,
-    );
-  }
 }

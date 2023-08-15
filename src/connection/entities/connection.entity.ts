@@ -18,10 +18,10 @@ export class Connection extends BaseEntity {
   @Column({ nullable: true })
   user2_id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   business_id: number;
 
-  @ManyToOne((type) => User, (user1) => user1.id, {
+  @ManyToOne(() => User, (user1) => user1.id, {
     eager: false,
   })
   user1: User;
