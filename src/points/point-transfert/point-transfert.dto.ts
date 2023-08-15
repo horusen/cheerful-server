@@ -32,4 +32,7 @@ export class PointTransfertDTO {
   @IsNotEmpty()
   @IsArray()
   receiver_ids: number[];
+
+  @Allow()
+  message: string;
 }
