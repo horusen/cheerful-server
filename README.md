@@ -1,73 +1,87 @@
+<h1 align="center">Cheerful</h1>
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+  <strong>Recognition and Rewards Platform</strong>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
+  </a>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+<p align="center">
+  Cheerful is a web platform enabling easy recognition and rewards for outstanding contributions through a point-system which can be exchanged for goods or services from local merchants.
+</p>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## :rocket: Tech Stack
 
-## Installation
+- **Frontend**: Angular 2, SCSS, Bootstrap 5, Fontawesome
+- **Backend**: NestJS
+- **Database**: MySQL, TypeORM - <a href="https://dbdiagram.io/d/64bfbd7602bd1c4a5ea98a93">_See the database modeling here_</a>
+- **Email**: Nodemailer
+- **SMS**: Twilio
+- **Caching**: Redis
+- **Cloud Storage**: Amazon S3
+- **Deployment**: Heroku
 
-```bash
-$ npm install
-```
+## :sparkles: Features
 
-## Running the app
+- **Point Management**: Load, send, and track points.
+- **Digital Gift Cards**: Exchange points for digital gift cards.
+- **Merchant Integration**: Local merchants offer gift cards.
+- **Secure Authentication**: User data protected with JWT authentication.
+- **Real-time Updates**: Stay updated with real-time point changes using Redis.
+- **Admin Interface**: Manage business admin and merchant activities.
+- **Email Invitations**: Invite individuals via email to register.
+- **CSV Bulk Import**: Add connections in bulk via CSV.
+- **Product Catalog**: Merchants can upload and manage their products.
+- **Gift Card Generation**: Secure and unique gift card codes.
+- **Redemption Tracking**: Merchants validate gift card redemptions.
 
-```bash
-# development
-$ npm run start
+## :zap: Getting Started
 
-# watch mode
-$ npm run start:dev
+1. Clone this repository.
+2. Clone also the frontend repo called **cheerful-client** and follow the instructions
+3. Install dependencies with `npm install`.
+4. Set up environment variables for database, Redis, Amazon S3, and JWT secret as specified in the .env-example file.
+5. Run backend: `npm run start:dev`.
 
-# production mode
-$ npm run start:prod
-```
+## :bulb: Usage
 
-## Test
+### Business Admin
 
-```bash
-# unit tests
-$ npm run test
+1. Register as a business admin from the landing page.
+2. Complete registration and provide business information.
+3. Invite individuals via email or username.
+4. Load points and transfer them to individuals.
+5. Access the dashboard and manage redemptions.
 
-# e2e tests
-$ npm run test:e2e
+### Individuals
 
-# test coverage
-$ npm run test:cov
-```
+1. Register using an invitation via email.
+2. Load points securely using Stripe or Paystack.
+3. Send and receive points from connections.
+4. Explore the marketplace and exchange points for gift cards.
 
-## Support
+### Merchant
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+1. Register as a merchant from the landing page.
+2. Complete registration and set up your store.
+3. Upload your product catalog to the platform.
+4. Validate and track gift card redemptions.
 
-## Stay in touch
+## :octocat: Contributing
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Contributions are welcome! Open issues and pull requests.
 
-## License
+## :scroll: License
 
-Nest is [MIT licensed](LICENSE).
+This project is licensed under the MIT License.
+
+## :lock: Security
+
+- Authentication: JWT ensures secure user authentication.
+- Authorization: NEST JS guards handle access control.
+- Gift Card Codes: SHA256 algorithm and secret key ensure code uniqueness.
+- Security Scans: Regular AWS CodeWhisperer scans ensure code integrity.
