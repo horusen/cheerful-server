@@ -48,7 +48,7 @@
 5. Run backend: `npm run start:dev`.
 
 ## :bulb: Usage
-
+_<a href="https://drive.google.com/file/d/1JX0rWeyOa7qeihalBay5sjX0dEsou3y_/view">:movie_camera: See how it works</a>_
 ### Business Admin
 
 1. Register as a business admin from the landing page.
