@@ -13,7 +13,6 @@ export class OtpService {
   constructor(
     @InjectRepository(Otp) private readonly _repo: Repository<Otp>,
     public configService: ConfigService,
-    public hashService: HashService, // public userService: UsersService,
   ) {}
 
   /**
@@ -49,9 +48,45 @@ export class OtpService {
     return otp;
   }
 
+  /**
+   * Generate a new OTP for a given user.
+   * If there is an existing OTP for the user, it will be canceled.
+   * @param userId - The ID of the user.
+   * @returns The generated OTP.
+   */
+  async generate(userId: number): Promise<Otp> {
+    // verify if there is an existing OTP for the user
+    const existingOtp = await this._repo.findOne({
+      where: { user_id: userId, otp_status_id: OtpStatusEnum.Pending },
+    });
+
+    // If there is an existing OTP, cancel it
+    if (existingOtp) {
+      existingOtp.otp_status_id = OtpStatusEnum.Canceled;
+      await this._repo.save(existingOtp);
+    }
+
+    // Generate a new OTP
+    const generatedCode = otpGenerator.generate(10, {
+      specialChars: false,
+      lowerCaseAlphabets: false,
+    });
+
+    const newOtp = await this._repo.save({
+      user_id: userId,
+      code: generatedCode,
+      otp_status_id: OtpStatusEnum.Pending,
+      expiry_datetime: new Date(Date.now() + 10 * 60 * 1000),
+    });
+
+    return newOtp;
+  }
+
   // Helper function to find the OTP record for the user
   private async findOtpRecord(userId: number): Promise<Otp> {
-    const otp = await this._repo.findOne({ where: { user_id: userId } });
+    const otp = await this._repo.findOne({
+      where: { user_id: userId, otp_status_id: OtpStatusEnum.Pending },
+    });
     if (!otp) {
       throw new HttpException('OTP not found', 404);
     }
@@ -101,7 +136,7 @@ export class OtpService {
 
   // Helper function to compare the provided OTP code with the stored code
   private async verifyOtp(otp: Otp, code: string): Promise<void> {
-    const isValidOtp = await this.hashService.compare(otp.code, code);
+    const isValidOtp = otp.code === code;
     if (!isValidOtp) {
       throw new HttpException('Invalid OTP', 422);
     }
@@ -111,39 +146,5 @@ export class OtpService {
   private async setOtpStatusVerified(otp: Otp): Promise<void> {
     otp.otp_status_id = OtpStatusEnum.Verified;
     await this._repo.save(otp);
-  }
-
-  /**
-   * Generate a new OTP for a given user.
-   * If there is an existing OTP for the user, it will be canceled.
-   * @param userId - The ID of the user.
-   * @returns The generated OTP.
-   */
-  async generate(userId: number): Promise<Otp> {
-    // verify if there is an existing OTP for the user
-    const existingOtp = await this._repo.findOne({
-      where: { user_id: userId, otp_status_id: OtpStatusEnum.Pending },
-    });
-
-    // If there is an existing OTP, cancel it
-    if (existingOtp) {
-      existingOtp.otp_status_id = OtpStatusEnum.Canceled;
-      await this._repo.save(existingOtp);
-    }
-
-    // Generate a new OTP
-    const generatedCode = otpGenerator.generate(10, {
-      specialChars: false,
-      lowerCaseAlphabets: false,
-    });
-
-    const newOtp = await this._repo.save({
-      user_id: userId,
-      code: generatedCode,
-      otp_status_id: OtpStatusEnum.Pending,
-      expiry_datetime: new Date(Date.now() + 10 * 60 * 1000),
-    });
-
-    return newOtp;
   }
 }

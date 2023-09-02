@@ -4,7 +4,6 @@ import { OtpService } from './otp.service';
 import { Otp } from '../entities/otp.entity';
 import { OtpStatusEnum } from '../enums/otp_status.enum';
 import { ConfigService } from '@nestjs/config';
-import { HashService } from 'src/shared/services/hash/hash.service';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as otpGenerator from 'otp-generator';
@@ -13,7 +12,6 @@ describe('OtpService', () => {
   let otpService: OtpService;
   let mockRepo: Partial<Repository<Otp>>;
   let mockConfigService: Partial<ConfigService>;
-  let mockHashService: Partial<HashService>;
 
   let otp: Otp;
   beforeEach(async () => {
@@ -24,9 +22,6 @@ describe('OtpService', () => {
 
     mockConfigService = {
       getOrThrow: jest.fn().mockReturnValue(5),
-    };
-    mockHashService = {
-      compare: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -45,7 +40,6 @@ describe('OtpService', () => {
         OtpService,
         { provide: getRepositoryToken(Otp), useValue: mockRepo },
         { provide: ConfigService, useValue: mockConfigService },
-        { provide: HashService, useValue: mockHashService },
       ],
     }).compile();
 
@@ -90,7 +84,6 @@ describe('OtpService', () => {
 
     it('Should increase the number of attempts', async () => {
       (mockRepo.save as jest.Mock).mockResolvedValue(otp);
-      (mockHashService.compare as jest.Mock).mockResolvedValue(true);
       await verify();
       expect(otp.attempt).toBe(1);
     });
@@ -114,7 +107,6 @@ describe('OtpService', () => {
     it('Shoud throw exception if OTP status is Verified', async () => {
       otp.otp_status_id = OtpStatusEnum.Verified;
 
-      (mockHashService.compare as jest.Mock).mockResolvedValue(true);
       try {
         await verify();
         fail('Expected HttpException to be thrown');
@@ -126,9 +118,8 @@ describe('OtpService', () => {
     });
 
     it('Should throw an exception if OTP code is invalid', async () => {
-      (mockHashService.compare as jest.Mock).mockResolvedValue(false);
       try {
-        await verify();
+        await verify(1, '2183928');
         fail('Expected HttpException to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(HttpException);
@@ -138,13 +129,11 @@ describe('OtpService', () => {
     });
 
     it('Should set the OTP status to verified if OTP code is valid', async () => {
-      (mockHashService.compare as jest.Mock).mockResolvedValue(true);
       await verify();
       expect(otp.otp_status_id).toBe(OtpStatusEnum.Verified);
     });
 
     it('Should return the OTP if the OTP code is valid', async () => {
-      (mockHashService.compare as jest.Mock).mockResolvedValue(true);
       expect(await verify()).toBe(otp);
     });
   });

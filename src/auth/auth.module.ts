@@ -14,6 +14,7 @@ import { InvitationModule } from 'src/connection/invitation/invitation.module';
 import { SessionModule } from 'src/session/session.module';
 import { StoreModule } from 'src/store/store.module';
 import { Sharedmodule } from 'src/shared/shared.module';
+import { OtpModule } from './otp/otp.module';
 
 @Global()
 @Module({
@@ -25,6 +26,7 @@ import { Sharedmodule } from 'src/shared/shared.module';
     InvitationModule,
     SessionModule,
     StoreModule,
+    OtpModule,
     Sharedmodule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
