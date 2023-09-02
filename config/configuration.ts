@@ -2,6 +2,7 @@ const DEFAULT_PORT = 3000;
 
 export default () => ({
   port: +process.env.PORT || DEFAULT_PORT,
+  otp_max_attempts: +process.env.OTP_MAX_ATTEMPTS || 5,
   JWT_SECRET: process.env.JWT_SECRET,
   database: {
     type: 'mysql',

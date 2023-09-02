@@ -21,11 +21,9 @@ import { TypeUserEnum } from 'src/users/type-users/type-user.enum';
 import { InvitationService } from 'src/connection/invitation/invitation.service';
 import { InvitationStatusEnum } from 'src/connection/invitation/invitation_status/invitation_status.enum';
 import { StoreService } from 'src/store/store.service';
+import { HashService } from 'src/shared/services/hash/hash.service';
 
 // import { StoreService } from 'src/store/store.service';
-
-const RANDOM_BYTE_LENGTH = 8;
-const SCRYPT_HASH_LENGTH = 32;
 
 @Injectable()
 export class AuthService {
@@ -37,6 +35,7 @@ export class AuthService {
     public emailService: EmailService,
     public invitationService: InvitationService,
     public storeService: StoreService,
+    public hashService: HashService,
   ) {}
 
   async login(user: User): Promise<{ user: User; accessToken: string }> {
@@ -57,22 +56,29 @@ export class AuthService {
 
   // TODO: add transaction to this method
   public async signup(userDTO: UserSignupDTO, profilePic: Express.Multer.File) {
+    // Initialize variables
     let image: File = null;
     let user: User;
 
-    const hashedPassword = this.hashPassword(userDTO.password);
+    // Hash the user's password
+    const hashedPassword = this.hashService.hash(userDTO.password);
 
-    // TODO: Send email verification
+    // TODO: Send email verification (add email verification logic here)
 
     if (userDTO.type_user_id == TypeUserEnum.Individual) {
+      // Check if the user already exists by email
       user = await this.usersService.findByEmail(userDTO.email);
 
-      if (!user) throw new UnprocessableEntityException('User is  not found');
+      if (!user) {
+        throw new UnprocessableEntityException('User not found');
+      }
 
+      // Save profile picture if provided
       if (profilePic) {
         image = await this._saveProfilePic(profilePic);
       }
 
+      // Update user details
       await this.invitationService.updateInvitationStatus(
         userDTO.invitation_id,
         InvitationStatusEnum.Accepted,
@@ -84,31 +90,39 @@ export class AuthService {
         profile_pic_id: image?.id,
       });
     } else {
+      // Check if the email is already in use
       const _user = await this.usersService.findByEmail(userDTO.email);
-      if (_user)
-        throw new UnprocessableEntityException('Email already in use ');
+      if (_user) {
+        throw new UnprocessableEntityException('Email already in use');
+      }
 
+      // Save profile picture if provided
       if (profilePic) {
         image = await this._saveProfilePic(profilePic);
       }
+
+      // Create a new user
       user = await this.usersService.create({
         ...userDTO,
         password: hashedPassword,
         profile_pic_id: image?.id,
       });
 
-      if (userDTO.type_user_id == TypeUserEnum.BusinessAdmin)
+      // Create associated business or store (if applicable)
+      if (userDTO.type_user_id == TypeUserEnum.BusinessAdmin) {
         await this.businessService.create({
           name: userDTO.business_name,
           creator_id: user.id,
         });
-      else if (userDTO.type_user_id == TypeUserEnum.Merchant)
+      } else if (userDTO.type_user_id == TypeUserEnum.Merchant) {
         await this.storeService.create({
           name: userDTO.store_name,
           creator_id: user.id,
         });
+      }
     }
 
+    // Perform login and return the result
     return this.login(user);
   }
 
@@ -125,20 +139,10 @@ export class AuthService {
 
     if (!user) throw new UnprocessableEntityException('User is not found');
 
-    const [salt, userPassword] = user.password.split('.');
-
-    if (
-      userPassword != scryptSync(password, salt, SCRYPT_HASH_LENGTH).toString()
-    )
+    if (!(await this.hashService.compare(user.password, password)))
       throw new UnprocessableEntityException('Invalid Password');
 
     return user;
-  }
-
-  public hashPassword(password: string, salt?: string): string {
-    salt = salt || randomBytes(RANDOM_BYTE_LENGTH).toString('hex');
-    const cryptedPassword = scryptSync(password, salt, SCRYPT_HASH_LENGTH);
-    return `${salt}.${cryptedPassword}`;
   }
 
   getCurrentUser(@Req() req: Request) {

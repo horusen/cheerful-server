@@ -13,6 +13,7 @@ import { EmailModule } from 'src/shared/email/email.module';
 import { InvitationModule } from 'src/connection/invitation/invitation.module';
 import { SessionModule } from 'src/session/session.module';
 import { StoreModule } from 'src/store/store.module';
+import { Sharedmodule } from 'src/shared/shared.module';
 
 @Global()
 @Module({
@@ -24,6 +25,7 @@ import { StoreModule } from 'src/store/store.module';
     InvitationModule,
     SessionModule,
     StoreModule,
+    Sharedmodule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
