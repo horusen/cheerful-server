@@ -1,8 +1,8 @@
-import { State } from './../../../state/entities/state.entity';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { Store } from 'src/store/entities/store.entity';
 import { Country } from 'src/users/country/entities/country.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
+import { State } from '../../../state/entities/state.entity';
 
 @Entity()
 export class StoreAddress extends BaseEntity {

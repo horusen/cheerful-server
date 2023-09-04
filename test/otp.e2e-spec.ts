@@ -7,7 +7,6 @@ import { DataSource, Repository } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from '../config/configuration';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { SeederModule } from '../src/shared/seeders/seeder.module';
 import { setupApp } from '../src/app-config';
 import { Otp } from '../src/auth/otp/entities/otp.entity';
 import { OtpStatusEnum } from '../src/auth/otp/enums/otp_status.enum';
@@ -41,7 +40,7 @@ describe('OTP', () => {
           useFactory: (configService: ConfigService) => ({
             type: 'mysql',
             url: 'mysql://root@localhost:3306/cheerful-test',
-            entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+            entities: [],
             migrations: ['dist/database/migration/*.js'],
             synchronize: true,
             dropSchema: true,
@@ -55,7 +54,6 @@ describe('OTP', () => {
           },
         }),
         OtpModule,
-        SeederModule,
       ],
     }).compile();
 

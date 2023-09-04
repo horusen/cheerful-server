@@ -9,9 +9,6 @@ import { BusinessModule } from './business/business.module';
 import { CurrencyModule } from './currency/currency.module';
 import configuration from 'config/configuration';
 import { AuthModule } from './auth/auth.module';
-import { FileModule } from './file/file.module';
-import { Seeder } from './shared/seeders/seed';
-import { SeederModule } from './shared/seeders/seeder.module';
 import { ConnectionModule } from './connection/connection.module';
 import { GroupModule } from './group/group.module';
 import { EmailModule } from './shared/email/email.module';
@@ -42,6 +39,7 @@ import { StoreModule } from './store/store.module';
         namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
+
       dataSourceFactory: async (options) => {
         const dataSource = await new DataSource(options).initialize();
         return dataSource;
@@ -50,7 +48,6 @@ import { StoreModule } from './store/store.module';
     BusinessModule,
     CurrencyModule,
     AuthModule,
-    SeederModule,
     ConnectionModule,
     GroupModule,
     EmailModule,
