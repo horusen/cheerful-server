@@ -13,10 +13,7 @@ export class Otp extends BaseEntity {
   @Column({ nullable: false, default: OtpStatusEnum.Pending })
   otp_status_id: number;
 
-  @Column({
-    nullable: true,
-    type: 'timestamp',
-  })
+  @Column({ nullable: true, type: 'timestamp' })
   expiry_datetime: Date;
 
   @Column({ nullable: false, default: 0 })

@@ -7,11 +7,13 @@ import { OtpStatusEnum } from '../enums/otp_status.enum';
 import { ConfigService } from '@nestjs/config';
 import { HashService } from 'src/shared/services/hash/hash.service';
 import * as otpGenerator from 'otp-generator';
+import { UsersService } from '../../../users/users.service';
 
 @Injectable()
 export class OtpService {
   constructor(
     @InjectRepository(Otp) private readonly _repo: Repository<Otp>,
+    public userService: UsersService,
     public configService: ConfigService,
   ) {}
 
@@ -55,6 +57,13 @@ export class OtpService {
    * @returns The generated OTP.
    */
   async generate(userId: number): Promise<Otp> {
+    // Check if the user exists
+    try {
+      await this.userService.findOne(userId);
+    } catch (error) {
+      throw new HttpException('User not found', 404);
+    }
+
     // verify if there is an existing OTP for the user
     const existingOtp = await this._repo.findOne({
       where: { user_id: userId, otp_status_id: OtpStatusEnum.Pending },

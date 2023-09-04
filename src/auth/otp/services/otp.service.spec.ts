@@ -7,11 +7,18 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as otpGenerator from 'otp-generator';
+import { UsersService } from '../../../users/users.service';
+import { fail } from 'assert';
 
 describe('OtpService', () => {
   let otpService: OtpService;
   let mockRepo: Partial<Repository<Otp>>;
+  let mockUserService: Partial<UsersService>;
   let mockConfigService: Partial<ConfigService>;
+  let user = {
+    id: 1,
+    name: 'test',
+  };
 
   let otp: Otp;
   beforeEach(async () => {
@@ -20,26 +27,20 @@ describe('OtpService', () => {
       save: jest.fn(),
     };
 
+    mockUserService = {
+      findOne: jest.fn(),
+    };
+
     mockConfigService = {
       getOrThrow: jest.fn().mockReturnValue(5),
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        // TypeOrmModule.forRoot({
-        //   type: 'sqlite',
-        //   database: ':memory:',
-        //   dropSchema: true,
-        //   synchronize: true,
-        //   logging: false,
-        //   entities: [],
-        // }),
-        // TypeOrmModule.forFeature([Otp]),
-      ],
       providers: [
         OtpService,
         { provide: getRepositoryToken(Otp), useValue: mockRepo },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: UsersService, useValue: mockUserService },
       ],
     }).compile();
 
@@ -154,7 +155,25 @@ describe('OtpService', () => {
         attempt: 0,
       } as Otp;
     });
+
+    it('Should throw exception if User is not found', async () => {
+      (mockUserService.findOne as jest.Mock).mockRejectedValue(
+        new HttpException('User not found', 404),
+      );
+      try {
+        await generate();
+        fail('Expected HttpException to be thrown');
+      } catch (error) {
+        console.log(error);
+        expect(error).toBeInstanceOf(HttpException);
+        expect(error.status).toBe(404);
+        expect(error.message).toBe('User not found');
+      }
+    });
+
     it('Should canced the otp record if it exists', async () => {
+      (mockUserService.findOne as jest.Mock).mockResolvedValue(user);
+      (mockUserService.findOne as jest.Mock).mockResolvedValue(user);
       (mockRepo.findOne as jest.Mock).mockResolvedValue(otp);
       await generate();
       expect(otp.otp_status_id).toBe(OtpStatusEnum.Canceled);
@@ -166,6 +185,7 @@ describe('OtpService', () => {
         code: 'AB539C899B',
       } as Otp;
 
+      (mockUserService.findOne as jest.Mock).mockResolvedValue(user);
       (mockRepo.findOne as jest.Mock).mockResolvedValue(null);
       (mockRepo.save as jest.Mock).mockResolvedValue(otp);
       const generatedCode = jest.spyOn(otpGenerator, 'generate');
