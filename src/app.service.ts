@@ -11,6 +11,6 @@ export class AppService implements OnModuleInit {
   constructor(public seeder: Seeder, public configService: ConfigService) {}
 
   onModuleInit() {
-    this.seeder.seed();
+    // this.seeder.seed();
   }
 }

@@ -1,7 +1,7 @@
 import { StateSeeder } from './../../state/state.seeder';
 import { GenderSeeder } from 'src/users/gender/gender.seeder';
 import { TypeUserSeeder } from '../../users/type-users/type-user.seeder';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CountrySeeder } from 'src/users/country/country.seeder';
 import { CurrencySeeder } from 'src/currency/currenty.seeder';
 import { BusinessTypeService } from 'src/business/business_type/business_type.service';
@@ -16,7 +16,7 @@ import { CategoryStoreSeeder } from 'src/store/category_store/category_store.see
 import { TypeStoreSeeder } from 'src/store/type-store/type-store.seeder';
 
 @Injectable()
-export class Seeder {
+export class Seeder implements OnModuleInit {
   constructor(
     public typeUserSeeder: TypeUserSeeder,
     public genderSeeder: GenderSeeder,
@@ -49,5 +49,9 @@ export class Seeder {
     await this.socialMediaSeeder.seed();
     await this.categoryStoreSeeder.seed();
     await this.typeStoreSeeder.seed();
+  }
+
+  async onModuleInit() {
+    await this.seed();
   }
 }
