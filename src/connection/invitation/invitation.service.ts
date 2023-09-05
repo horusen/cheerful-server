@@ -87,17 +87,17 @@ export class InvitationService extends BaseService<Invitation> {
     invitationId: number,
     status: InvitationStatusEnum,
   ) {
+    let invitation = await this.repo.findOne({ where: { id: invitationId } });
+    if (!invitation) throw new HttpException('Invitation not found', 422);
+
     if (status == InvitationStatusEnum.Accepted) {
-      await this._accetpInvitation(invitationId);
+      await this.acceptInvitation(invitation);
     } else {
-      await this._abortInvitation(invitationId);
+      await this.abortInvitation(invitation);
     }
   }
 
-  private async _accetpInvitation(invitationId: number) {
-    let invitation = await this.repo.findOne({ where: { id: invitationId } });
-    if (!invitation) throw new HttpException('Invitation not found', 404);
-
+  async acceptInvitation(invitation: Invitation) {
     invitation.status_id = InvitationStatusEnum.Accepted;
     invitation = await this._repo.save(invitation);
 
@@ -106,10 +106,7 @@ export class InvitationService extends BaseService<Invitation> {
     return invitation;
   }
 
-  private async _abortInvitation(invitationId: number) {
-    let invitation = await this.repo.findOne({ where: { id: invitationId } });
-    if (!invitation) throw new HttpException('Invitation not found', 404);
-
+  async abortInvitation(invitation: Invitation) {
     // Check if the connection type is UserToUser
     const isUserToUserConnection =
       invitation.connection_type_id === ConnectionTypeEnum.UserToUser;
@@ -131,7 +128,10 @@ export class InvitationService extends BaseService<Invitation> {
     // If the current user or business is the sender, update the status of the invitation
     if (!isCurrentUserSender || !isCurrentBusinessSender)
       throw new HttpException('You are not the sender of this invitation', 400);
-    this.update(invitationId, { status_id: InvitationStatusEnum.Aborted });
+
+    // Update invitation
+    invitation.status_id = InvitationStatusEnum.Aborted;
+    await this._repo.save(invitation);
   }
 
   async createConnection(invitation: Invitation) {
