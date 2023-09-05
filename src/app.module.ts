@@ -19,6 +19,7 @@ import { SessionModule } from './session/session.module';
 import { PointsModule } from './points/points.module';
 import { EntityTypeModule } from './entity-type/entity-type.module';
 import { StoreModule } from './store/store.module';
+import { TypeOrmConfigService } from './shared/services/typorm.service';
 
 @Module({
   imports: [
@@ -28,22 +29,7 @@ import { StoreModule } from './store/store.module';
       cache: true,
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        url: configService.get('database.uri'),
-        entities: [],
-        migrations: ['dist/database/migration/*.js'],
-        synchronize: true,
-        autoLoadEntities: true,
-        namingStrategy: new SnakeNamingStrategy(),
-      }),
-      inject: [ConfigService],
-
-      dataSourceFactory: async (options) => {
-        const dataSource = await new DataSource(options).initialize();
-        return dataSource;
-      },
+      useClass: TypeOrmConfigService,
     }),
     BusinessModule,
     CurrencyModule,

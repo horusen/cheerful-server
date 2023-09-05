@@ -11,6 +11,8 @@ import { setupApp } from '../src/app-config';
 import { Otp } from '../src/auth/otp/entities/otp.entity';
 import { OtpStatusEnum } from '../src/auth/otp/enums/otp_status.enum';
 import { OtpModule } from '../src/auth/otp/otp.module';
+import { testDatabseConfig } from './test-database-config';
+import { TypeOrmConfigService } from '../src/shared/services/typorm.service';
 
 describe('OTP', () => {
   let app: INestApplication;
@@ -34,25 +36,9 @@ describe('OTP', () => {
           isGlobal: true,
           load: [configuration],
           cache: true,
+          envFilePath: ['.env.test'],
         }),
-        TypeOrmModule.forRootAsync({
-          imports: [ConfigModule],
-          useFactory: (configService: ConfigService) => ({
-            type: 'mysql',
-            url: 'mysql://root@localhost:3306/cheerful-test',
-            entities: [],
-            migrations: ['dist/database/migration/*.js'],
-            synchronize: true,
-            dropSchema: true,
-            autoLoadEntities: true,
-            namingStrategy: new SnakeNamingStrategy(),
-          }),
-          inject: [ConfigService],
-          dataSourceFactory: async (options) => {
-            const dataSource = await new DataSource(options).initialize();
-            return dataSource;
-          },
-        }),
+        TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
         OtpModule,
       ],
     }).compile();
@@ -61,7 +47,6 @@ describe('OTP', () => {
     setupApp(app);
     otpRepository = moduleFixture.get(getRepositoryToken(Otp));
     userRepository = moduleFixture.get(getRepositoryToken(User));
-
     await app.init();
   });
 
