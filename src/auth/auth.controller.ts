@@ -8,6 +8,7 @@ import {
   Body,
   UploadedFile,
   UnprocessableEntityException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -15,6 +16,7 @@ import { AuthService } from './auth.service';
 import { UserSignupDTO } from './dtos/user-signup.dto';
 import { UsersService } from 'src/users/users.service';
 import { Public } from 'src/shared/decorators/public.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Public()
 @Controller('auth')
@@ -24,6 +26,7 @@ export class AuthController {
     public usersService: UsersService,
   ) {}
 
+  @UseInterceptors(FileInterceptor('profile_pic'))
   @Post('signup')
   async signup(
     @Body() body: UserSignupDTO,
