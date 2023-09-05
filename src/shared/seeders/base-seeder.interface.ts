@@ -1,7 +1,8 @@
+import { OnModuleInit } from '@nestjs/common';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { DeepPartial, Repository } from 'typeorm';
 
-export abstract class BaseSeeder<T extends BaseEntity> {
+export abstract class BaseSeeder<T extends BaseEntity> implements OnModuleInit {
   private _items: DeepPartial<T>[];
   constructor(
     public readonly repo: Repository<T>,
@@ -19,5 +20,9 @@ export abstract class BaseSeeder<T extends BaseEntity> {
     await this.repo.save(createdItems);
 
     return;
+  }
+
+  async onModuleInit() {
+    await this.seed();
   }
 }

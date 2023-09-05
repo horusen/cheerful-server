@@ -10,6 +10,7 @@ import { StoreAddressModule } from './store-address/store-address.module';
 import { StoreProductModule } from './store-product/store-product.module';
 import { FileModule } from 'src/file/file.module';
 import { TypeStoreModule } from './type-store/type-store.module';
+import { StateModule } from './../state/state.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TypeStoreModule } from './type-store/type-store.module';
     StoreSocialMediaModule,
     StoreAddressModule,
     StoreCardModule,
+    StateModule,
     StoreProductModule,
   ],
   controllers: [StoreController],
