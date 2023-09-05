@@ -1,17 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import { ConfigModule } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'src/users/users.entity';
-import { DataSource, Repository } from 'typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as request from 'supertest';
+import { Repository } from 'typeorm';
 import configuration from '../config/configuration';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { setupApp } from '../src/app-config';
 import { Otp } from '../src/auth/otp/entities/otp.entity';
 import { OtpStatusEnum } from '../src/auth/otp/enums/otp_status.enum';
 import { OtpModule } from '../src/auth/otp/otp.module';
-import { testDatabseConfig } from './test-database-config';
 import { TypeOrmConfigService } from '../src/shared/services/typorm.service';
 
 describe('OTP', () => {
