@@ -18,8 +18,8 @@ export class UserSignupDTO {
   @IsNotEmpty()
   country_id: number;
 
-  @IsNotEmpty()
   @IsEnum(TypeUserEnum)
+  @IsNotEmpty()
   type_user_id: number;
 
   @ValidateIf((o) => o.type_user_id === TypeUserEnum.Individual)
