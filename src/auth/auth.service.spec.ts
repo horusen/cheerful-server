@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { FileService } from '../file/file.service';
 import { JwtService } from '@nestjs/jwt';
@@ -23,6 +23,7 @@ import { File } from 'src/file/file.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let mockDataSource: DataSource;
   let userSignupDTO: UserSignupDTO;
   let mockUserService: Partial<UsersService>;
   let mockFileService: Partial<FileService>;
@@ -138,6 +139,7 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
+    dataSource = module.get<DataSource>(DataSource);
   });
 
   it('should be defined', () => {

@@ -2,7 +2,6 @@ import { Injectable, Req, UnprocessableEntityException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { BusinessService } from 'src/business/business.service';
 import { InvitationService } from 'src/connection/invitation/invitation.service';
-import { InvitationStatusEnum } from 'src/connection/invitation/invitation_status/invitation_status.enum';
 import { File } from 'src/file/file.entity';
 import { FileService } from 'src/file/file.service';
 import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
@@ -11,13 +10,12 @@ import { HashService } from 'src/shared/services/hash/hash.service';
 import { StoreService } from 'src/store/store.service';
 import { TypeUserEnum } from 'src/users/type-users/type-user.enum';
 import { User } from 'src/users/users.entity';
+import { DataSource, EntityManager } from 'typeorm';
+import { Business } from '../business/entities/business.entity';
+import { Invitation } from '../connection/invitation/invitation.entity';
+import { Store } from '../store/entities/store.entity';
 import { UsersService } from './../users/users.service';
 import { UserSignupDTO } from './dtos/user-signup.dto';
-import { Invitation } from '../connection/invitation/invitation.entity';
-import { Business } from '../business/entities/business.entity';
-import { Store } from '../store/entities/store.entity';
-
-// import { StoreService } from 'src/store/store.service';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +28,7 @@ export class AuthService {
     public invitationService: InvitationService,
     public storeService: StoreService,
     public hashService: HashService,
+    public dataSource: DataSource,
   ) {}
 
   async login(user: User): Promise<{
@@ -63,6 +62,7 @@ export class AuthService {
       user = await this.signupNonIndividual(userDTO, profilePic);
     }
 
+    console.log(user);
     return this.login(user);
   }
 
@@ -90,18 +90,21 @@ export class AuthService {
     let image: File = null;
     const hashedPassword = this.hashService.hash(userDTO.password);
 
-    // Save profile picture if provided
-    if (profilePic) {
-      image = await this.saveProfilePic(profilePic);
-    }
+    // Start the transaction
+    await this.dataSource.transaction(async (manager) => {
+      // Save profile picture if provided
+      if (profilePic) {
+        image = await this.saveProfilePic(profilePic, manager);
+      }
 
-    // Update user details
-    await this.invitationService.acceptInvitation(invitation);
+      // Update user details
+      await this.invitationService.acceptInvitation(invitation);
 
-    user = await this.usersService.update(user.id, {
-      ...userDTO,
-      password: hashedPassword,
-      profile_pic_id: image?.id,
+      user = await this.usersService.update(user.id, {
+        ...userDTO,
+        password: hashedPassword,
+        profile_pic_id: image?.id,
+      });
     });
 
     return user;
@@ -119,39 +122,56 @@ export class AuthService {
     let image: File = null;
     const hashedPassword = this.hashService.hash(userDTO.password);
 
-    // Save profile picture if provided
-    if (profilePic) {
-      image = await this.saveProfilePic(profilePic);
-    }
+    // Start the transaction
+    await this.dataSource.transaction(async (manager) => {
+      if (profilePic) {
+        image = await this.saveProfilePic(profilePic, manager);
+      }
 
-    // Create a new user
-    user = await this.usersService.create({
-      ...userDTO,
-      password: hashedPassword,
-      profile_pic_id: image?.id,
+      // Create a new user
+      user = await this.usersService.createWithEntityManager(
+        {
+          ...userDTO,
+          password: hashedPassword,
+          profile_pic_id: image?.id,
+        },
+        manager,
+      );
+
+      // Create associated business or store depending of the type user
+      if (userDTO.type_user_id == TypeUserEnum.BusinessAdmin) {
+        await this.businessService.createWithEntityManager(
+          {
+            name: userDTO.business_name,
+            creator_id: user.id,
+          },
+          manager,
+        );
+      } else if (userDTO.type_user_id == TypeUserEnum.Merchant) {
+        await this.storeService.createWithEntityManager(
+          {
+            name: userDTO.store_name,
+            creator_id: user.id,
+          },
+          manager,
+        );
+      }
+
+      throw new UnprocessableEntityException('Invitation not found');
     });
-
-    // Create associated business or store depending of the type user
-    if (userDTO.type_user_id == TypeUserEnum.BusinessAdmin) {
-      await this.businessService.create({
-        name: userDTO.business_name,
-        creator_id: user.id,
-      });
-    } else if (userDTO.type_user_id == TypeUserEnum.Merchant) {
-      await this.storeService.create({
-        name: userDTO.store_name,
-        creator_id: user.id,
-      });
-    }
 
     return user;
   }
 
-  async saveProfilePic(profilePic: Express.Multer.File) {
+  async saveProfilePic(
+    profilePic: Express.Multer.File,
+    entityManager: EntityManager,
+  ) {
     return await this.fileService.uploadFile(
       profilePic.buffer,
       profilePic.originalname,
       FileTypeEnum.IMAGE,
+      entityManager,
     );
   }
 
