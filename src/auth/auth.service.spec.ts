@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { FileService } from '../file/file.service';
 import { JwtService } from '@nestjs/jwt';
@@ -20,6 +20,7 @@ import { Store } from '../store/entities/store.entity';
 import { FileType } from '../file/file_type/entities/file_type.entity';
 import { FileTypeEnum } from '../file/file_type/file_type.enum';
 import { File } from 'src/file/file.entity';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -39,9 +40,10 @@ describe('AuthService', () => {
   let mockFile: File;
   let mockInvitation: Invitation;
   let mockProfilePic: Express.Multer.File;
+  let mockEntityManager: EntityManager;
 
   const setupMocks = () => {
-    mockUser = { id: 1, name: 'John Doe' } as User;
+    mockUser = { id: 1, name: 'John Doe', password: 'password' } as User;
     mockBusiness = { id: 1, name: 'My business' } as Business;
     mockStore = { id: 1, name: 'My store' } as Store;
     mockFile = { id: '1', url: 'https://example.com' } as File;
@@ -51,41 +53,20 @@ describe('AuthService', () => {
       originalname: 'profile_image.jpg',
     } as Express.Multer.File;
 
-    mockUserService = {
-      findByEmail: jest.fn(),
-      update: jest.fn(),
-      create: jest.fn(),
-    };
-
-    mockHashService = {
-      hash: jest.fn(),
-      compare: jest.fn(),
-    };
-
-    mockFileService = {
-      uploadFile: jest.fn(),
-    };
-
-    mockInvitationService = {
-      acceptInvitation: jest.fn(),
-      findOne: jest.fn(),
-    };
-
-    mockJwtService = {
-      sign: jest.fn(),
-    };
-
-    mockBusinessService = {
-      create: jest.fn(),
-      findByCreatorId: jest.fn(),
-    };
-
-    mockEmailService = {};
-
-    mockStoreService = {
-      findByCreatorId: jest.fn(),
-      create: jest.fn(),
-    };
+    mockEntityManager = createMock<EntityManager>();
+    mockUserService = createMock<UsersService>();
+    mockHashService = createMock<HashService>();
+    mockFileService = createMock<FileService>();
+    mockInvitationService = createMock<InvitationService>();
+    mockJwtService = createMock<JwtService>();
+    mockBusinessService = createMock<BusinessService>();
+    mockEmailService = createMock<EmailService>();
+    mockStoreService = createMock<StoreService>();
+    mockDataSource = createMock<DataSource>({
+      transaction: jest.fn().mockImplementation((callback: Function) => {
+        callback();
+      }),
+    });
   };
 
   beforeEach(async () => {
@@ -135,30 +116,127 @@ describe('AuthService', () => {
           provide: HashService,
           useValue: mockHashService,
         },
+        {
+          provide: DataSource,
+          useValue: mockDataSource,
+        },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    dataSource = module.get<DataSource>(DataSource);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
+  describe('Login', () => {
+    const login = async () => {
+      return await service.login(mockUser);
+    };
+
+    beforeEach(() => {
+      (mockJwtService.sign as jest.Mock).mockReturnValue('accessToken');
+    });
+
+    it('Should return the user, the user type and an access token', async () => {
+      mockUser.type_user_id = 1;
+      (mockUserService.findByEmail as jest.Mock).mockResolvedValue(mockUser);
+      (mockHashService.compare as jest.Mock).mockResolvedValue(true);
+
+      const response = await login();
+      expect(response.user).toBeDefined();
+      expect(response.type_user).toBeDefined();
+      expect(response.accessToken).toBeDefined();
+    });
+
+    // should return the user, the access token and business if the user is a business admin
+    it('Should return the user, the user type, the access token and business', async () => {
+      mockUser.type_user_id = 2;
+      (mockUserService.findByEmail as jest.Mock).mockResolvedValue(mockUser);
+      (mockHashService.compare as jest.Mock).mockResolvedValue(true);
+      (mockBusinessService.findByCreatorId as jest.Mock).mockResolvedValue(
+        mockBusiness,
+      );
+
+      const response = await login();
+      expect(response.user).toBeDefined();
+      expect(response.type_user).toBeDefined();
+      expect(response.accessToken).toBeDefined();
+      expect(response.business).toBeDefined();
+    });
+
+    // should return the user, the access token and store if the user is a merchant
+    it('Should return the user, the user type, the access token and store', async () => {
+      mockUser.type_user_id = 3;
+      (mockUserService.findByEmail as jest.Mock).mockResolvedValue(mockUser);
+      (mockHashService.compare as jest.Mock).mockResolvedValue(true);
+      (mockStoreService.findByCreatorId as jest.Mock).mockResolvedValue(
+        mockStore,
+      );
+
+      const response = await login();
+      expect(response.user).toBeDefined();
+      expect(response.type_user).toBeDefined();
+      expect(response.accessToken).toBeDefined();
+      expect(response.store).toBeDefined();
+    });
+  });
+
+  describe('Signin', () => {
+    let signin = async () => {
+      return await service.signin(mockUser.email, mockUser.password);
+    };
+
+    it("Should throw an exception if the user doesn't exist", async () => {
+      jest.spyOn(mockUserService, 'findByEmail').mockResolvedValue(null);
+
+      try {
+        await signin();
+        fail('Should throw an exception');
+      } catch (e) {
+        expect(e).toBeInstanceOf(UnprocessableEntityException);
+        expect(e.message).toBe('User is not found');
+      }
+    });
+
+    it('Should throw an exception if the password is incorrect', async () => {
+      jest.spyOn(mockUserService, 'findByEmail').mockResolvedValue(mockUser);
+      jest.spyOn(mockHashService, 'compare').mockResolvedValue(false);
+
+      try {
+        await signin();
+        fail('Should throw an exception');
+      } catch (e) {
+        expect(e).toBeInstanceOf(UnprocessableEntityException);
+        expect(e.message).toBe('Invalid password');
+      }
+    });
+
+    it('Should signin the user succesfully', async () => {
+      jest.spyOn(mockUserService, 'findByEmail').mockResolvedValue(mockUser);
+      jest.spyOn(mockHashService, 'compare').mockResolvedValue(true);
+
+      const result = await signin();
+      expect(result).toEqual(mockUser);
+    });
+  });
+
   describe('signup', () => {
     it("Should save the user's profile picture", async () => {
       // Arrange
       (mockFileService.uploadFile as jest.Mock).mockResolvedValue(mockFile);
+      const mockEntityManager = createMock<EntityManager>();
 
       // Act
-      await service.saveProfilePic(mockProfilePic);
+      await service.saveProfilePic(mockProfilePic, mockEntityManager);
 
       // Assert
       expect(mockFileService.uploadFile).toBeCalledWith(
         mockProfilePic.buffer,
         mockProfilePic.originalname,
         FileTypeEnum.IMAGE,
+        mockEntityManager,
       );
     });
 
@@ -262,7 +340,9 @@ describe('AuthService', () => {
         userSignupDTO.business_name = 'Business name';
 
         (mockUserService.findByEmail as jest.Mock).mockResolvedValue(null);
-        (mockUserService.create as jest.Mock).mockResolvedValue(mockUser);
+        (
+          mockUserService.createWithEntityManager as jest.Mock
+        ).mockResolvedValue(mockUser);
         (mockHashService.hash as jest.Mock).mockReturnValue('hashedPassword');
         (mockBusinessService.create as jest.Mock).mockResolvedValue(
           mockBusiness,
@@ -278,28 +358,29 @@ describe('AuthService', () => {
         );
 
         // Expect to create the user
-        expect(service.usersService.create).toBeCalledWith({
-          ...userSignupDTO,
-          password: 'hashedPassword',
-          profile_pic_id: undefined,
-        });
+        expect(service.usersService.createWithEntityManager).toBeCalledWith(
+          {
+            ...userSignupDTO,
+            password: 'hashedPassword',
+            profile_pic_id: undefined,
+          },
+          mockEntityManager,
+        );
 
         // Expect to create the business
-        expect(service.businessService.create).toBeCalledWith({
-          name: userSignupDTO.business_name,
-          creator_id: 1,
-        });
+        expect(service.businessService.createWithEntityManager).toBeCalledWith(
+          {
+            name: userSignupDTO.business_name,
+            creator_id: 1,
+          },
+          mockEntityManager,
+        );
 
         expect(user).toBeDefined();
       });
 
       //Should signup the user as Merchant
       it('Should signup the user as Merchant', async () => {
-        const mockProfilePic = {
-          buffer: Buffer.from('profile_image_data'),
-          originalname: 'profile_image.jpg',
-        } as Express.Multer.File;
-
         // Arrange
         userSignupDTO.type_user_id = TypeUserEnum.Merchant;
         userSignupDTO.store_name = 'Store name';
@@ -320,21 +401,19 @@ describe('AuthService', () => {
           userSignupDTO.password,
         );
 
+        expect(service.dataSource.transaction).toHaveBeenCalled();
+
         // Expect to upload the profile picture
-        expect(service.saveProfilePic).toBeCalledWith(mockProfilePic);
+        expect(service.saveProfilePic).toHaveBeenCalledWith(
+          mockProfilePic,
+          mockEntityManager,
+        );
 
         // Expect to create the user
-        expect(service.usersService.create).toHaveBeenCalledWith({
-          ...userSignupDTO,
-          password: 'hashedPassword',
-          profile_pic_id: mockFile.id,
-        });
+        expect(service.usersService.createWithEntityManager).toHaveBeenCalled();
 
         // Expect to create the store
-        expect(service.storeService.create).toHaveBeenCalledWith({
-          name: userSignupDTO.store_name,
-          creator_id: 1,
-        });
+        expect(service.storeService.createWithEntityManager).toHaveBeenCalled();
 
         expect(user).toBeDefined();
       });
@@ -360,84 +439,6 @@ describe('AuthService', () => {
 
       // Assert
       expect(user).toBeDefined();
-    });
-
-    describe('login', () => {
-      const login = async () => {
-        return await service.login(mockUser);
-      };
-
-      beforeEach(() => {
-        (mockJwtService.sign as jest.Mock).mockReturnValue('accessToken');
-      });
-
-      // it("Should throw an exception if the user doesn't exist", async () => {
-      //   (mockUserService.findByEmail as jest.Mock).mockRejectedValue(null);
-
-      //   try {
-      //     await login();
-      //     fail('Should throw an exception');
-      //   } catch (e) {
-      //     expect(e).toBeInstanceOf(UnprocessableEntityException);
-      //     expect(e.message).toBe('User not found');
-      //   }
-      // });
-
-      // it('Should throw an exception if the password is incorrect', async () => {
-      //   (mockUserService.findByEmail as jest.Mock).mockResolvedValue(user);
-      //   (mockHashService.compare as jest.Mock).mockRejectedValue(false);
-      //   try {
-      //     await login();
-      //     fail('Should throw an exception');
-      //   } catch (e) {
-      //     expect(e).toBeInstanceOf(UnprocessableEntityException);
-      //     expect(e.message).toBe('Incorrect password');
-      //   }
-      // });
-
-      // should return the user and an access token
-      it('Should return the user, the user type and an access token', async () => {
-        mockUser.type_user_id = 1;
-        (mockUserService.findByEmail as jest.Mock).mockResolvedValue(mockUser);
-        (mockHashService.compare as jest.Mock).mockResolvedValue(true);
-
-        const response = await login();
-        expect(response.user).toBeDefined();
-        expect(response.type_user).toBeDefined();
-        expect(response.accessToken).toBeDefined();
-      });
-
-      // should return the user, the access token and business if the user is a business admin
-      it('Should return the user, the user type, the access token and business', async () => {
-        mockUser.type_user_id = 2;
-        (mockUserService.findByEmail as jest.Mock).mockResolvedValue(mockUser);
-        (mockHashService.compare as jest.Mock).mockResolvedValue(true);
-        (mockBusinessService.findByCreatorId as jest.Mock).mockResolvedValue(
-          mockBusiness,
-        );
-
-        const response = await login();
-        expect(response.user).toBeDefined();
-        expect(response.type_user).toBeDefined();
-        expect(response.accessToken).toBeDefined();
-        expect(response.business).toBeDefined();
-      });
-
-      // should return the user, the access token and store if the user is a merchant
-      it('Should return the user, the user type, the access token and store', async () => {
-        mockUser.type_user_id = 3;
-        (mockUserService.findByEmail as jest.Mock).mockResolvedValue(mockUser);
-        (mockHashService.compare as jest.Mock).mockResolvedValue(true);
-        (mockStoreService.findByCreatorId as jest.Mock).mockResolvedValue(
-          mockStore,
-        );
-
-        const response = await login();
-        expect(response.user).toBeDefined();
-        expect(response.type_user).toBeDefined();
-        expect(response.accessToken).toBeDefined();
-        expect(response.store).toBeDefined();
-      });
     });
   });
 });
