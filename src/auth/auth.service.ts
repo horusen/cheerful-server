@@ -62,8 +62,22 @@ export class AuthService {
       user = await this.signupNonIndividual(userDTO, profilePic);
     }
 
-    console.log(user);
     return this.login(user);
+  }
+
+  public async signin(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
+    console.log(user);
+    if (!user) throw new UnprocessableEntityException('User is not found');
+
+    const isPasswordCorrect = await this.hashService.compare(
+      password,
+      user.password,
+    );
+    if (!isPasswordCorrect)
+      throw new UnprocessableEntityException('Invalid password');
+
+    return user;
   }
 
   async signupIndividual(
@@ -88,7 +102,7 @@ export class AuthService {
     }
 
     let image: File = null;
-    const hashedPassword = this.hashService.hash(userDTO.password);
+    const hashedPassword = await this.hashService.hash(userDTO.password);
 
     // Start the transaction
     await this.dataSource.transaction(async (manager) => {
@@ -120,7 +134,7 @@ export class AuthService {
     }
 
     let image: File = null;
-    const hashedPassword = this.hashService.hash(userDTO.password);
+    const hashedPassword = await this.hashService.hash(userDTO.password);
 
     // Start the transaction
     await this.dataSource.transaction(async (manager) => {
@@ -156,8 +170,6 @@ export class AuthService {
           manager,
         );
       }
-
-      throw new UnprocessableEntityException('Invitation not found');
     });
 
     return user;
@@ -173,16 +185,6 @@ export class AuthService {
       FileTypeEnum.IMAGE,
       entityManager,
     );
-  }
-
-  public async signin(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) throw new UnprocessableEntityException('User is not found');
-
-    if (!(await this.hashService.compare(user.password, password)))
-      throw new UnprocessableEntityException('Invalid Password');
-
-    return user;
   }
 
   getCurrentUser(@Req() req: Request) {
