@@ -19,7 +19,8 @@ export class UsersService extends BaseService<User> {
   }
 
   async findByEmail(email: string) {
-    return await this.repo.findOne({ where: { email } });
+    const user = await this.repo.findOne({ where: { email } });
+    return user;
   }
 
   async updatePointBalance(

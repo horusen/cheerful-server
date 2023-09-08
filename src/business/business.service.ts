@@ -1,17 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateBusinessDto } from './dto/create-business.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
-import { BaseService } from 'src/shared/services/base.service';
-import { Business } from './entities/business.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { FileService } from 'src/file/file.service';
-import { File } from 'src/file/file.entity';
-import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
 import { ConfigService } from '@nestjs/config';
-import { PointsLoadService } from 'src/points/point-load/points-load.service';
-import { PointTransfertService } from 'src/points/point-transfert/point-transfert.service';
-import { SessionService } from 'src/session/session.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { File } from 'src/file/file.entity';
+import { FileService } from 'src/file/file.service';
+import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
+import { BaseService } from 'src/shared/services/base.service';
+import { Repository } from 'typeorm';
+import { Business } from './entities/business.entity';
 
 @Injectable()
 export class BusinessService extends BaseService<Business> {
