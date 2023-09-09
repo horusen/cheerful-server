@@ -16,6 +16,7 @@ import { Invitation } from '../connection/invitation/invitation.entity';
 import { Store } from '../store/entities/store.entity';
 import { UsersService } from './../users/users.service';
 import { UserSignupDTO } from './dtos/user-signup.dto';
+import { OtpService } from './otp/services/otp.service';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,7 @@ export class AuthService {
     public storeService: StoreService,
     public hashService: HashService,
     public dataSource: DataSource,
+    public otpService: OtpService,
   ) {}
 
   async login(user: User): Promise<{
@@ -53,7 +55,6 @@ export class AuthService {
     return { ...response, accessToken: this.jwtService.sign(payload) };
   }
 
-  // TODO: add transaction to this method
   public async signup(userDTO: UserSignupDTO, profilePic: Express.Multer.File) {
     let user: User;
     if (userDTO.type_user_id == TypeUserEnum.Individual) {
@@ -61,6 +62,9 @@ export class AuthService {
     } else {
       user = await this.signupNonIndividual(userDTO, profilePic);
     }
+
+    const otp = await this.otpService.generate(user.id);
+    await this.emailService.sendOTP(user, otp);
 
     return this.login(user);
   }

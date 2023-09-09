@@ -1,9 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AES, enc } from 'crypto-js';
 import { Business } from 'src/business/entities/business.entity';
 import { User } from 'src/users/users.entity';
+import { Otp } from '../../auth/otp/entities/otp.entity';
 
 @Injectable()
 export class EmailService {
@@ -11,22 +12,6 @@ export class EmailService {
     public emailService: MailerService,
     public configService: ConfigService,
   ) {}
-
-  sendConfirmationEmail(user: User, token: string) {
-    const confirmationUrl = `${this.configService.get(
-      'FRONTEND_URL',
-    )}/auth/confirm?token=${token}`;
-
-    this.emailService.sendMail({
-      to: user.email,
-      subject: 'Welcome to Cheerful. Verify your email address.',
-      template: './confirmation-email',
-      context: {
-        name: user.name,
-        confirmation_url: confirmationUrl,
-      },
-    });
-  }
 
   sendInvitationtionEmail(
     sender: User | Business,
@@ -57,5 +42,21 @@ export class EmailService {
         registration_url: registrationUrl,
       },
     });
+  }
+
+  async sendOTP(user: User, otp: Otp) {
+    await this.emailService
+      .sendMail({
+        to: user.email,
+        subject: 'Verification code',
+        template: './otp-email.ejs',
+        context: {
+          user,
+          otp,
+        },
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException('Error sending OTP email');
+      });
   }
 }
