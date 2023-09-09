@@ -17,10 +17,12 @@ import { Invitation } from '../connection/invitation/invitation.entity';
 import { User } from '../users/users.entity';
 import { Business } from '../business/entities/business.entity';
 import { Store } from '../store/entities/store.entity';
-import { FileType } from '../file/file_type/entities/file_type.entity';
 import { FileTypeEnum } from '../file/file_type/file_type.enum';
 import { File } from 'src/file/file.entity';
 import { createMock } from '@golevelup/ts-jest';
+import { OtpService } from './otp/services/otp.service';
+import { OtpStatusEnum } from './otp/enums/otp_status.enum';
+import { Otp } from './otp/entities/otp.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -34,6 +36,7 @@ describe('AuthService', () => {
   let mockInvitationService: Partial<InvitationService>;
   let mockStoreService: Partial<StoreService>;
   let mockHashService: Partial<HashService>;
+  let mockOtpService: OtpService;
   let mockUser: User;
   let mockBusiness: Business;
   let mockStore: Store;
@@ -62,6 +65,7 @@ describe('AuthService', () => {
     mockBusinessService = createMock<BusinessService>();
     mockEmailService = createMock<EmailService>();
     mockStoreService = createMock<StoreService>();
+    mockOtpService = createMock<OtpService>();
     mockDataSource = createMock<DataSource>({
       transaction: jest.fn().mockImplementation((callback: Function) => {
         callback();
@@ -119,6 +123,10 @@ describe('AuthService', () => {
         {
           provide: DataSource,
           useValue: mockDataSource,
+        },
+        {
+          provide: OtpService,
+          useValue: mockOtpService,
         },
       ],
     }).compile();
@@ -419,7 +427,7 @@ describe('AuthService', () => {
       });
     });
 
-    it('Should save the user and login', async () => {
+    it('Should save the user, send the Otp and login', async () => {
       userSignupDTO.type_user_id = TypeUserEnum.Individual;
       // Arrange
       (mockInvitationService.findOne as jest.Mock).mockResolvedValue(
@@ -433,12 +441,25 @@ describe('AuthService', () => {
         accessToken: 'access token',
         type_user: TypeUserEnum.Individual,
       });
+      const mockOtp = {
+        id: 1,
+        code: '1234555',
+        user_id: mockUser.id,
+        otp_status_id: OtpStatusEnum.Pending,
+        attempt: 0,
+      } as Otp;
+      const otpServiceSpy = jest.spyOn(mockOtpService, 'generate');
+      const emailServiceSpy = jest.spyOn(mockEmailService, 'sendOTP');
+
+      otpServiceSpy.mockResolvedValue(mockOtp);
 
       // Act
       const user = await service.signup(userSignupDTO, null);
 
       // Assert
       expect(user).toBeDefined();
+      expect(otpServiceSpy).toHaveBeenCalledWith(mockUser.id);
+      expect(emailServiceSpy).toHaveBeenCalledWith(mockUser, mockOtp);
     });
   });
 });
