@@ -64,7 +64,6 @@ describe('EmailService', () => {
         await sentOtp();
         fail('Should throw an exception');
       } catch (error) {
-        console.log(error);
         expect(error).toBeInstanceOf(InternalServerErrorException);
         expect(error.message).toBe('Error sending OTP email');
       }

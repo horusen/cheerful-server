@@ -9,4 +9,5 @@ export const mockUser = {
   point_balance: 20,
   password: 'Password',
   country_id: 1,
+  email: 'WtQ3t@example.com',
 } as User;

@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Business } from './entities/business.entity';
 import { FileModule } from 'src/file/file.module';
 import { PointsModule } from 'src/points/points.module';
+import { CurrencyModule } from '../currency/currency.module';
 
 @Module({
   controllers: [BusinessController],
@@ -18,6 +19,7 @@ import { PointsModule } from 'src/points/points.module';
     BusinessAdminModule,
     BusinessTypeModule,
     BusinessIndustryModule,
+    CurrencyModule,
     FileModule,
     TypeOrmModule.forFeature([Business]),
   ],

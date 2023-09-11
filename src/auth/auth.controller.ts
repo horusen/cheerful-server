@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UnprocessableEntityException,
   UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -37,6 +38,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
+  @HttpCode(200)
   async login(@Request() req: Request) {
     return this.authService.login(req['user']);
   }
