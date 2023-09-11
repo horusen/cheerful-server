@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 /**
@@ -20,7 +20,6 @@ export class HashService {
   public async hash(stringItem: string): Promise<string> {
     const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
     const hashedString = await bcrypt.hash(stringItem, salt);
-    console.log('hashedString: ', hashedString);
     return hashedString;
   }
 
@@ -31,9 +30,13 @@ export class HashService {
    * @returns A promise that resolves to a boolean indicating whether the strings match.
    */
   public async compare(
-    hashedString: string,
     stringItem: string,
+    hashedString: string,
   ): Promise<boolean> {
+    if (!stringItem || !hashedString)
+      throw new UnprocessableEntityException(
+        'Please provide valid arguments to compare',
+      );
     return await bcrypt.compare(stringItem, hashedString);
   }
 }

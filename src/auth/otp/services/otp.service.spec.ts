@@ -164,7 +164,6 @@ describe('OtpService', () => {
         await generate();
         fail('Expected HttpException to be thrown');
       } catch (error) {
-        console.log(error);
         expect(error).toBeInstanceOf(HttpException);
         expect(error.status).toBe(404);
         expect(error.message).toBe('User not found');

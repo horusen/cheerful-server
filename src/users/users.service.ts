@@ -1,10 +1,13 @@
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User } from './users.entity';
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmailService } from 'src/shared/email/email.service';
 import { BaseService } from 'src/shared/services/base.service';
-import { DeepPartial, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { User } from './users.entity';
 
 @Injectable()
 export class UsersService extends BaseService<User> {
@@ -16,7 +19,8 @@ export class UsersService extends BaseService<User> {
   }
 
   async findByEmail(email: string) {
-    return this.repo.findOne({ where: { email } });
+    const user = await this.repo.findOne({ where: { email } });
+    return user;
   }
 
   async updatePointBalance(

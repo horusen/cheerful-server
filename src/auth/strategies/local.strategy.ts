@@ -17,15 +17,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
-
-    if (!user) throw new UnprocessableEntityException('User is not found');
-
-    const [salt, userPassword] = user.password.split('.');
-
-    if (userPassword != scryptSync(password, salt, 32).toString())
-      throw new UnprocessableEntityException('Invalid Password');
-
-    return user;
+    return await this.authService.signin(email, password);
   }
 }

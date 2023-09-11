@@ -44,7 +44,7 @@ export class User extends BaseEntity {
   verified: boolean;
 
   @Column({ nullable: true })
-  profile_pic_id: number;
+  profile_pic_id: string;
 
   @Column({ nullable: false, default: 0, type: 'double' })
   point_balance: number;
