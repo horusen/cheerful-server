@@ -20,7 +20,6 @@ export class UsersService extends BaseService<User> {
 
   async findByEmail(email: string) {
     const user = await this.repo.findOne({ where: { email } });
-    console.log(user);
     return user;
   }
 

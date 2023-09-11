@@ -20,7 +20,6 @@ export class HashService {
   public async hash(stringItem: string): Promise<string> {
     const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
     const hashedString = await bcrypt.hash(stringItem, salt);
-    console.log('hashedString: ', hashedString);
     return hashedString;
   }
 
