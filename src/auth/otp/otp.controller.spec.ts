@@ -4,6 +4,7 @@ import { OtpService } from './services/otp.service';
 import { verifyOtpDto } from './dtos/verify-otp.dto';
 import { Otp } from './entities/otp.entity';
 import { OtpStatusEnum } from './enums/otp_status.enum';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('OtpController', () => {
   let controller: OtpController;
@@ -13,10 +14,7 @@ describe('OtpController', () => {
   let otpVerifyDto: verifyOtpDto;
 
   beforeEach(async () => {
-    const mockOtpService = {
-      generate: jest.fn(),
-      verify: jest.fn(),
-    };
+    const mockOtpService = createMock<OtpService>();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OtpController],
       providers: [
@@ -44,8 +42,8 @@ describe('OtpController', () => {
   describe('generate', () => {
     it('should generate an OTP for a user', async () => {
       // Mock the generate method of the OtpService
-      (otpService.generate as jest.Mock).mockResolvedValue(otp);
-      const result = await controller.generate(userId);
+      (otpService.send as jest.Mock).mockResolvedValue(otp);
+      const result = await controller.send({ userId });
 
       expect(result).toBe(otp);
     });

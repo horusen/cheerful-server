@@ -4,17 +4,22 @@ import { OtpService } from './otp.service';
 import { Otp } from '../entities/otp.entity';
 import { OtpStatusEnum } from '../enums/otp_status.enum';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as otpGenerator from 'otp-generator';
 import { UsersService } from '../../../users/users.service';
 import { fail } from 'assert';
+import { EmailService } from '../../../shared/email/email.service';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('OtpService', () => {
   let otpService: OtpService;
   let mockRepo: Partial<Repository<Otp>>;
   let mockUserService: Partial<UsersService>;
   let mockConfigService: Partial<ConfigService>;
+  let mockEmailService: EmailService;
+  let mockDataSource: DataSource;
+  let mockEntityManager: EntityManager;
   let user = {
     id: 1,
     name: 'test',
@@ -22,18 +27,20 @@ describe('OtpService', () => {
 
   let otp: Otp;
   beforeEach(async () => {
-    mockRepo = {
-      findOne: jest.fn(),
-      save: jest.fn(),
-    };
+    mockEmailService = createMock<EmailService>();
+    mockRepo = createMock<Repository<Otp>>();
+    mockUserService = createMock<UsersService>();
+    mockConfigService = createMock<ConfigService>();
+    mockEntityManager = createMock<EntityManager>();
 
-    mockUserService = {
-      findOne: jest.fn(),
-    };
-
-    mockConfigService = {
-      getOrThrow: jest.fn().mockReturnValue(5),
-    };
+    type TransactionFunctionMock = (entityManager: EntityManager) => void;
+    mockDataSource = createMock<DataSource>({
+      transaction: jest
+        .fn()
+        .mockImplementation((callback: TransactionFunctionMock) => {
+          callback(mockEntityManager);
+        }),
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -41,6 +48,8 @@ describe('OtpService', () => {
         { provide: getRepositoryToken(Otp), useValue: mockRepo },
         { provide: ConfigService, useValue: mockConfigService },
         { provide: UsersService, useValue: mockUserService },
+        { provide: EmailService, useValue: mockEmailService },
+        { provide: DataSource, useValue: mockDataSource },
       ],
     }).compile();
 
@@ -125,7 +134,7 @@ describe('OtpService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(HttpException);
         expect(error.status).toBe(422);
-        expect(error.message).toBe('Invalid OTP');
+        expect(error.message).toBe('Invalid code');
       }
     });
 
@@ -135,14 +144,18 @@ describe('OtpService', () => {
     });
 
     it('Should return the OTP if the OTP code is valid', async () => {
-      expect(await verify()).toBe(otp);
+      const verification = await verify();
+      expect(mockDataSource.transaction).toBeCalledTimes(1);
+      expect(mockEntityManager.save).toBeCalled();
+      expect(mockUserService.updateWithEntityManager).toBeCalled();
+      expect(verification).toBe(otp);
     });
   });
 
-  describe('generate', () => {
+  describe('send', () => {
     let otp: Otp;
-    let generate = async (userId = 1) => {
-      return await otpService.generate(userId);
+    let send = async (userId = 1) => {
+      return await otpService.send(userId);
     };
 
     beforeEach(() => {
@@ -153,6 +166,7 @@ describe('OtpService', () => {
         // Current date + 10 minutes
         expiry_datetime: new Date(Date.now() + 10 * 60 * 1000),
         attempt: 0,
+        deleted_at: null,
       } as Otp;
     });
 
@@ -161,7 +175,7 @@ describe('OtpService', () => {
         new HttpException('User not found', 404),
       );
       try {
-        await generate();
+        await send();
         fail('Expected HttpException to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(HttpException);
@@ -170,15 +184,15 @@ describe('OtpService', () => {
       }
     });
 
-    it('Should canced the otp record if it exists', async () => {
-      (mockUserService.findOne as jest.Mock).mockResolvedValue(user);
+    it('Should cancel and delete the OTP record if it exists', async () => {
       (mockUserService.findOne as jest.Mock).mockResolvedValue(user);
       (mockRepo.findOne as jest.Mock).mockResolvedValue(otp);
-      await generate();
+      await send();
       expect(otp.otp_status_id).toBe(OtpStatusEnum.Canceled);
+      expect(otp.deleted_at).toBeDefined();
     });
 
-    it('should generate a new otp', async () => {
+    it('should send a new otp', async () => {
       otp = {
         ...otp,
         code: 'AB539C899B',
@@ -187,9 +201,11 @@ describe('OtpService', () => {
       (mockUserService.findOne as jest.Mock).mockResolvedValue(user);
       (mockRepo.findOne as jest.Mock).mockResolvedValue(null);
       (mockRepo.save as jest.Mock).mockResolvedValue(otp);
-      const generatedCode = jest.spyOn(otpGenerator, 'generate');
-      expect(await generate()).toEqual(otp);
-      expect(generatedCode).toHaveBeenCalled();
+      const emailServiceSpy = jest.spyOn(mockEmailService, 'sendOTP');
+      const generatedCodeSpy = jest.spyOn(otpGenerator, 'generate');
+      expect(await send()).toEqual(otp);
+      expect(emailServiceSpy).toHaveBeenCalled();
+      expect(generatedCodeSpy).toHaveBeenCalled();
     });
   });
 });

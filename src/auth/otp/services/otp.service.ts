@@ -1,20 +1,22 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { BaseService } from 'src/shared/services/base.service';
-import { Otp } from '../entities/otp.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { OtpStatusEnum } from '../enums/otp_status.enum';
 import { ConfigService } from '@nestjs/config';
-import { HashService } from 'src/shared/services/hash/hash.service';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as otpGenerator from 'otp-generator';
+import { DataSource, Repository } from 'typeorm';
+import { EmailService } from '../../../shared/email/email.service';
 import { UsersService } from '../../../users/users.service';
+import { Otp } from '../entities/otp.entity';
+import { OtpStatusEnum } from '../enums/otp_status.enum';
+import { User } from './../../../users/users.entity';
 
 @Injectable()
 export class OtpService {
   constructor(
     @InjectRepository(Otp) private readonly _repo: Repository<Otp>,
+    public dataSource: DataSource,
     public userService: UsersService,
     public configService: ConfigService,
+    public emailService: EmailService,
   ) {}
 
   /**
@@ -25,41 +27,43 @@ export class OtpService {
    * @returns True if the OTP is valid, otherwise throws an exception
    */
   async verify(userId: number, code: string) {
-    // Step 1: Find the OTP record for the user
     const otp = await this.findOtpRecord(userId);
-
-    // Step 2: Increment the attempt counter and save the OTP record
     this.incrementAttempt(otp);
 
-    // Step 3: Check if the number of attempts exceeds the maximum allowed
-    const maxAttempts = 5; // You can retrieve this from configuration if needed
+    const maxAttempts = 5;
     this.checkMaxAttempts(otp, maxAttempts);
 
-    // Step 4: Check if the OTP has expired
     this.checkExpiration(otp);
 
-    // Step 5: Check the status of the OTP and throw exceptions accordingly
     this.checkOtpStatus(otp);
 
-    // Step 6: Compare the provided OTP code with the stored code
     await this.verifyOtp(otp, code);
 
-    // Step 7: Set the OTP status to Verified and return the OTP object
-    await this.setOtpStatusVerified(otp);
+    this.dataSource.transaction(async (transactionalEntityManager) => {
+      otp.otp_status_id = OtpStatusEnum.Verified;
+      await transactionalEntityManager.save(otp);
+
+      await this.userService.updateWithEntityManager(
+        userId,
+        { verified: true },
+        transactionalEntityManager,
+      );
+    });
 
     return otp;
   }
 
   /**
-   * Generate a new OTP for a given user.
+   * Generate a new OTP for a given user and send it via email.
    * If there is an existing OTP for the user, it will be canceled.
    * @param userId - The ID of the user.
    * @returns The generated OTP.
    */
-  async generate(userId: number): Promise<Otp> {
+  async send(userId: number): Promise<Otp> {
     // Check if the user exists
+    let user: User;
     try {
-      await this.userService.findOne(userId);
+      user = await this.userService.findOne(userId);
     } catch (error) {
       throw new HttpException('User not found', 404);
     }
@@ -73,6 +77,7 @@ export class OtpService {
     if (existingOtp) {
       existingOtp.otp_status_id = OtpStatusEnum.Canceled;
       await this._repo.save(existingOtp);
+      await this._repo.softRemove(existingOtp);
     }
 
     // Generate a new OTP
@@ -88,13 +93,15 @@ export class OtpService {
       expiry_datetime: new Date(Date.now() + 10 * 60 * 1000),
     });
 
+    await this.emailService.sendOTP(user, newOtp);
+
     return newOtp;
   }
 
   // Helper function to find the OTP record for the user
   private async findOtpRecord(userId: number): Promise<Otp> {
     const otp = await this._repo.findOne({
-      where: { user_id: userId, otp_status_id: OtpStatusEnum.Pending },
+      where: { user_id: userId },
     });
     if (!otp) {
       throw new HttpException('OTP not found', 404);
@@ -147,13 +154,7 @@ export class OtpService {
   private async verifyOtp(otp: Otp, code: string): Promise<void> {
     const isValidOtp = otp.code === code;
     if (!isValidOtp) {
-      throw new HttpException('Invalid OTP', 422);
+      throw new HttpException('Invalid code', 422);
     }
-  }
-
-  // Helper function to set the OTP status to Verified and return the OTP object
-  private async setOtpStatusVerified(otp: Otp): Promise<void> {
-    otp.otp_status_id = OtpStatusEnum.Verified;
-    await this._repo.save(otp);
   }
 }
