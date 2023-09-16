@@ -5,7 +5,6 @@ import { UsersService } from '../users/users.service';
 import { FileService } from '../file/file.service';
 import { JwtService } from '@nestjs/jwt';
 import { BusinessService } from '../business/business.service';
-import { EmailService } from '../shared/email/email.service';
 import { InvitationService } from '../connection/invitation/invitation.service';
 import { StoreService } from '../store/store.service';
 import { HashService } from '../shared/services/hash/hash.service';
@@ -32,7 +31,6 @@ describe('AuthService', () => {
   let mockFileService: Partial<FileService>;
   let mockJwtService: Partial<JwtService>;
   let mockBusinessService: Partial<BusinessService>;
-  let mockEmailService: Partial<EmailService>;
   let mockInvitationService: Partial<InvitationService>;
   let mockStoreService: Partial<StoreService>;
   let mockHashService: Partial<HashService>;
@@ -63,7 +61,6 @@ describe('AuthService', () => {
     mockInvitationService = createMock<InvitationService>();
     mockJwtService = createMock<JwtService>();
     mockBusinessService = createMock<BusinessService>();
-    mockEmailService = createMock<EmailService>();
     mockStoreService = createMock<StoreService>();
     mockOtpService = createMock<OtpService>();
     mockDataSource = createMock<DataSource>({
@@ -104,10 +101,7 @@ describe('AuthService', () => {
           provide: BusinessService,
           useValue: mockBusinessService,
         },
-        {
-          provide: EmailService,
-          useValue: mockEmailService,
-        },
+
         {
           provide: InvitationService,
           useValue: mockInvitationService,
@@ -448,8 +442,7 @@ describe('AuthService', () => {
         otp_status_id: OtpStatusEnum.Pending,
         attempt: 0,
       } as Otp;
-      const otpServiceSpy = jest.spyOn(mockOtpService, 'generate');
-      const emailServiceSpy = jest.spyOn(mockEmailService, 'sendOTP');
+      const otpServiceSpy = jest.spyOn(mockOtpService, 'send');
 
       otpServiceSpy.mockResolvedValue(mockOtp);
 
@@ -459,7 +452,6 @@ describe('AuthService', () => {
       // Assert
       expect(user).toBeDefined();
       expect(otpServiceSpy).toHaveBeenCalledWith(mockUser.id);
-      expect(emailServiceSpy).toHaveBeenCalledWith(mockUser, mockOtp);
     });
   });
 });

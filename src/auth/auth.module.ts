@@ -22,7 +22,6 @@ import { Sharedmodule } from '../shared/shared.module';
     UsersModule,
     FileModule,
     BusinessModule,
-    EmailModule,
     InvitationModule,
     SessionModule,
     StoreModule,

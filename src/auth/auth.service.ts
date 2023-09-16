@@ -5,7 +5,6 @@ import { InvitationService } from 'src/connection/invitation/invitation.service'
 import { File } from 'src/file/file.entity';
 import { FileService } from 'src/file/file.service';
 import { FileTypeEnum } from 'src/file/file_type/file_type.enum';
-import { EmailService } from 'src/shared/email/email.service';
 import { HashService } from 'src/shared/services/hash/hash.service';
 import { StoreService } from 'src/store/store.service';
 import { TypeUserEnum } from 'src/users/type-users/type-user.enum';
@@ -25,7 +24,6 @@ export class AuthService {
     public jwtService: JwtService,
     public fileService: FileService,
     public businessService: BusinessService,
-    public emailService: EmailService,
     public invitationService: InvitationService,
     public storeService: StoreService,
     public hashService: HashService,
@@ -63,8 +61,7 @@ export class AuthService {
       user = await this.signupNonIndividual(userDTO, profilePic);
     }
 
-    const otp = await this.otpService.generate(user.id);
-    await this.emailService.sendOTP(user, otp);
+    await this.otpService.send(user.id);
 
     return this.login(user);
   }
