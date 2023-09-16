@@ -58,6 +58,23 @@ export class BaseService<Entity> {
     return await this.repo.findOneBy({ id });
   }
 
+  async updateWithEntityManager(
+    id: number,
+    updateDTO: any,
+    entityManager: EntityManager,
+  ) {
+    //@ts-expect-error
+    const element = await this.repo.findOneBy({ id });
+    if (!element) throw new NotFoundException();
+    // await this.repo.merge(element, updateDTO);
+    Object.keys(updateDTO).forEach((key) => {
+      element[key] = updateDTO[key];
+    });
+    await entityManager.save(element);
+    //@ts-expect-error
+    return await this.repo.findOneBy({ id });
+  }
+
   async remove(id: number) {
     //@ts-expect-error
     const element = await this.repo.findOneBy({ id });
